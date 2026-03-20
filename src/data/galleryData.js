@@ -221,7 +221,7 @@ const galleryPlaneData = [
     blob2Color: '#d0a880',
     label: {
       word: 'Pop!',
-      description: 'The moment the balloon gives in — water exploding in every direction against the black background, with just the deflated rubber and a hand left in the middle of the chaos.',
+      description: 'The moment the balloon gives in — water exploding in every direction against the black background, with just the hand left in the middle of the chaos.',
       iso: '6,400',
       av: 'f/7.1',
       tv: '1/4,000s',
