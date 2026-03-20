@@ -15,14 +15,23 @@
 </head>
 
 <body class="demo-1">
-  <div id="loading-screen" aria-label="Loading gallery">
-    <p id="loading-title">Lachie's Photos</p>
-    <div id="loading-progress">
-      <div id="loading-bar">
-        <div id="loading-bar-fill"></div>
-      </div>
-      <span id="loading-counter">0 / 0</span>
-    </div>
+  <div id="loading-screen">
+    <p id="loading-header">Lachie's Photos</p>
+    <ul id="loading-steps" role="status" aria-live="polite">
+      <li class="loading-step" data-step="environment" data-state="pending">
+        <span class="loading-step__icon" aria-hidden="true"></span>
+        <span class="loading-step__label">Loading Environment</span>
+      </li>
+      <li class="loading-step" data-step="photos" data-state="pending">
+        <span class="loading-step__icon" aria-hidden="true"></span>
+        <span class="loading-step__label">Loading Photos</span>
+        <span class="loading-step__count" id="loading-photo-count"></span>
+      </li>
+      <li class="loading-step" data-step="rendering" data-state="pending">
+        <span class="loading-step__icon" aria-hidden="true"></span>
+        <span class="loading-step__label">Rendering</span>
+      </li>
+    </ul>
   </div>
   <main>
     <header class="frame">

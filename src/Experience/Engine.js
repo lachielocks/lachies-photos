@@ -85,38 +85,61 @@ class Engine {
   async init() {
     if (this.isInitialized) return
 
-    try {
-      this.preloadedTextures = await this.preloadTextures()
-      this.experience.gallery.setPreloadedTextures(this.preloadedTextures)
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+    try {
+      // Step 1 — Loading Environment (minimum 1s)
+      this.setLoadingStep('environment', 'active')
+      const envStart = performance.now()
+      // (environment is constructed synchronously; pad to 1s for UX)
+      await sleep(Math.max(0, 1000 - (performance.now() - envStart)))
+
+      // Step 2 — Loading Photos (real progress, minimum 1s)
+      this.setLoadingStep('environment', 'done')
+      this.setLoadingStep('photos', 'active')
+      const photosStart = performance.now()
+      this.preloadedTextures = await this.preloadTextures()
+      await sleep(Math.max(0, 1000 - (performance.now() - photosStart)))
+
+      // Step 3 — Rendering (minimum 1s)
+      this.setLoadingStep('photos', 'done')
+      this.setLoadingStep('rendering', 'active')
+      const renderStart = performance.now()
+      this.experience.gallery.setPreloadedTextures(this.preloadedTextures)
       await this.experience.init(this.scene, this.camera)
       this.scroll.init()
       this.initStats()
       this.bindDebug()
       this.setDebugUiVisible(false)
-
       this.resize()
       window.addEventListener('resize', this.onResize)
       window.addEventListener('keydown', this.onKeyDown)
       document.addEventListener('fullscreenchange', this.onFullscreenChange)
       this.scroll.bindEvents()
-
       this.nav.init((index) => this.scroll.navigateToPlane(index))
       this.initArrows()
       this.initPresentToggle()
-
       this.isInitialized = true
       this.start()
+      await sleep(Math.max(0, 1000 - (performance.now() - renderStart)))
+
+      // All done — brief pause showing all ticks
+      this.setLoadingStep('rendering', 'done')
+      await sleep(600)
     } finally {
       this.hideLoadingScreen()
+      this.playIntroAnimation()
     }
   }
 
+  setLoadingStep(step, state) {
+    const el = document.querySelector(`[data-step="${step}"]`)
+    if (el) el.dataset.state = state
+  }
+
   updateLoadingProgress(loaded, total) {
-    const counter = document.getElementById('loading-counter')
-    const fill = document.getElementById('loading-bar-fill')
-    if (counter) counter.textContent = `${loaded} / ${total}`
-    if (fill) fill.style.width = `${total > 0 ? (loaded / total) * 100 : 0}%`
+    const count = document.getElementById('loading-photo-count')
+    if (count) count.textContent = `${loaded} / ${total}`
   }
 
   hideLoadingScreen() {
@@ -124,6 +147,12 @@ class Engine {
     if (!screen) return
     screen.classList.add('is-hidden')
     screen.addEventListener('transitionend', () => screen.remove(), { once: true })
+  }
+
+  playIntroAnimation() {
+    document.body.classList.add('is-ready')
+    // Slight delay so the photo slides in as the loading screen finishes fading
+    setTimeout(() => this.experience.gallery?.startIntroAnimation(), 200)
   }
 
   initPresentToggle() {
