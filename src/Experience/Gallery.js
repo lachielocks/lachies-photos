@@ -45,11 +45,14 @@ class Gallery {
     this.driftCurrent = 0
     this.driftTarget = 0
 
-    // Intro animation
+    // Intro spring animation
     this.introActive = false
-    this.introStartTime = 0
-    this.introDuration = 1000
-    this.introStartOffsetX = 5.5
+    this.introCurrentX = 0
+    this.introVelocityX = 0
+    this.introStartOffsetX = 6.5
+    this.introStiffness = 22
+    this.introDamping = 7
+    this.introLastFrameTime = 0
 
     // Pointer events
     this.onPointerMove = (event) => {
@@ -64,8 +67,10 @@ class Gallery {
 
   startIntroAnimation() {
     if (!this.isInitialized) return
+    this.introCurrentX = this.introStartOffsetX
+    this.introVelocityX = 0
+    this.introLastFrameTime = performance.now()
     this.introActive = true
-    this.introStartTime = performance.now()
   }
 
   async init(scene) {
@@ -503,12 +508,22 @@ class Gallery {
       plane.position.z = zPosition
 
       if (this.introActive && index === 0) {
-        const elapsed = performance.now() - this.introStartTime
-        const t = Math.min(elapsed / this.introDuration, 1)
-        // Ease out cubic
-        const eased = 1 - Math.pow(1 - t, 3)
-        plane.position.x += this.introStartOffsetX * (1 - eased)
-        if (t >= 1) this.introActive = false
+        const now = performance.now()
+        const dt = Math.min((now - this.introLastFrameTime) / 1000, 0.05)
+        this.introLastFrameTime = now
+
+        // Spring: F = -k*x - c*v
+        const springForce = -this.introStiffness * this.introCurrentX
+        const dampingForce = -this.introDamping * this.introVelocityX
+        this.introVelocityX += (springForce + dampingForce) * dt
+        this.introCurrentX += this.introVelocityX * dt
+
+        if (Math.abs(this.introCurrentX) < 0.0008 && Math.abs(this.introVelocityX) < 0.0008) {
+          this.introCurrentX = 0
+          this.introActive = false
+        }
+
+        plane.position.x += this.introCurrentX
       }
 
       const breathInfluence = this.breathEnabled ? this.breathIntensity * opacity : 0
