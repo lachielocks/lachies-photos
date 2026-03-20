@@ -85,8 +85,6 @@ class Engine {
   async init() {
     if (this.isInitialized) return
 
-    document.body.classList.add('loading')
-
     try {
       this.preloadedTextures = await this.preloadTextures()
       this.experience.gallery.setPreloadedTextures(this.preloadedTextures)
@@ -110,8 +108,22 @@ class Engine {
       this.isInitialized = true
       this.start()
     } finally {
-      document.body.classList.remove('loading')
+      this.hideLoadingScreen()
     }
+  }
+
+  updateLoadingProgress(loaded, total) {
+    const counter = document.getElementById('loading-counter')
+    const fill = document.getElementById('loading-bar-fill')
+    if (counter) counter.textContent = `${loaded} / ${total}`
+    if (fill) fill.style.width = `${total > 0 ? (loaded / total) * 100 : 0}%`
+  }
+
+  hideLoadingScreen() {
+    const screen = document.getElementById('loading-screen')
+    if (!screen) return
+    screen.classList.add('is-hidden')
+    screen.addEventListener('transitionend', () => screen.remove(), { once: true })
   }
 
   initPresentToggle() {
@@ -184,6 +196,9 @@ class Engine {
 
     const textureLoader = new THREE.TextureLoader()
     const loadedTextures = new Map()
+    let loaded = 0
+
+    this.updateLoadingProgress(0, textureSources.length)
 
     await Promise.all(
       textureSources.map(async (textureSource) => {
@@ -194,6 +209,8 @@ class Engine {
         } catch (error) {
           console.warn(`Texture failed to load: ${textureSource}`, error)
         }
+        loaded++
+        this.updateLoadingProgress(loaded, textureSources.length)
       })
     )
 
