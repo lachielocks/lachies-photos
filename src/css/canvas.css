@@ -516,35 +516,15 @@ body.is-expanded .gallery-arrows {
     width: 1rem;
     height: 1rem;
     flex-shrink: 0;
+    transition: opacity 200ms ease;
   }
+
+  /* Show correct icon based on mute state */
+  &[data-muted='true'] .mute-btn__icon--sound { display: none; }
+  &[data-muted='false'] .mute-btn__icon--muted { display: none; }
 
   &:hover {
     color: rgba(255, 255, 255, 0.75);
     border-color: rgba(255, 255, 255, 0.4);
   }
-}
-
-.mute-btn__tooltip {
-  position: absolute;
-  bottom: calc(100% + 0.6rem);
-  right: 0;
-  background: rgba(8, 8, 12, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.35rem 0.65rem;
-  font-size: 9px;
-  font-family: var(--ui-font);
-  text-transform: uppercase;
-  letter-spacing: var(--ui-tracking);
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateY(5px);
-  transition:
-    opacity 200ms ease,
-    transform 200ms ease;
-  pointer-events: none;
-}
-
-.mute-btn:hover .mute-btn__tooltip {
-  opacity: 1;
-  transform: translateY(0);
 }
