@@ -10,12 +10,16 @@ class Cursor {
 
     this.hoveredPlaneIndex = -1
     this.isExpanded = false
+    this.clientX = -10
+    this.clientY = -10
 
     this.el = null
     this.ringEl = null
     this.labelEl = null
 
     this.onMouseMove = (e) => {
+      this.clientX = e.clientX
+      this.clientY = e.clientY
       if (!this.el) return
       this.el.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
       this.el.classList.remove('is-offscreen')
@@ -63,6 +67,8 @@ class Cursor {
     const plane = this.gallery.planes[planeIndex]
     if (!plane) return
     this.isExpanded = true
+    // Tell Gallery to pin this plane at full opacity (bypasses visibility blending)
+    this.gallery.expandedPlaneIndex = planeIndex
     // Move camera close to the plane — 3.8 units away fills ~95% of screen height
     this.scroll.setExpandZ(plane.position.z + 3.8)
     document.body.classList.add('is-expanded')
@@ -70,12 +76,24 @@ class Cursor {
 
   collapse() {
     this.isExpanded = false
+    this.gallery.expandedPlaneIndex = -1
     this.scroll.clearExpand()
     document.body.classList.remove('is-expanded')
   }
 
+  /** Returns true if the DOM element under the cursor is a UI overlay (nav, buttons, etc.) */
+  isOverUI() {
+    const el = document.elementFromPoint(this.clientX, this.clientY)
+    if (!el) return false
+    return Boolean(
+      el.closest(
+        '.gallery-nav, .gallery-arrows, .frame, .mute-btn, .plane-label-overlay, button, a, input, select'
+      )
+    )
+  }
+
   updateHover() {
-    if (!this.camera || this.isExpanded) {
+    if (!this.camera || this.isExpanded || this.isOverUI()) {
       this.hoveredPlaneIndex = -1
       return
     }

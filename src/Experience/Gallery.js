@@ -68,6 +68,9 @@ class Gallery {
     this.planeFadeSampleOffset = 1
     this.planeFadeSmoothing = 0.14
 
+    // When >= 0, that plane is locked at full opacity (click-to-expand)
+    this.expandedPlaneIndex = -1
+
     // Parallax
     this.parallaxEnabled = true
     this.parallaxAmountX = 0.16
@@ -484,6 +487,25 @@ class Gallery {
   }
 
   updatePlaneVisibility(cameraZ) {
+    // Expanded mode: pin the chosen plane at full opacity, fade everyone else out
+    if (this.expandedPlaneIndex >= 0) {
+      this.planes.forEach((plane, index) => {
+        const targetOpacity = index === this.expandedPlaneIndex ? 1 : 0
+        const uni = plane.material.uniforms
+        uni.uOpacity.value = THREE.MathUtils.lerp(
+          uni.uOpacity.value,
+          targetOpacity,
+          this.planeFadeSmoothing
+        )
+        uni.uBlur.value = THREE.MathUtils.lerp(
+          uni.uBlur.value,
+          Math.pow(1.0 - targetOpacity, 2),
+          this.planeFadeSmoothing
+        )
+      })
+      return
+    }
+
     const blendData = this.getPlaneBlendData(cameraZ)
     if (!blendData) return
 

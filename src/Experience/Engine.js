@@ -4,6 +4,7 @@ import { world } from '@/Experience/'
 import { Scroll } from '@/Experience/Scroll'
 import { Nav } from '@/Experience/Nav'
 import { Cursor } from '@/Experience/Cursor'
+import { Music } from '@/Experience/Music'
 
 class Engine {
   constructor(canvas, experience = world) {
@@ -37,6 +38,9 @@ class Engine {
 
     // Cursor (custom circle cursor + click-to-expand)
     this.cursor = new Cursor({ gallery: this.experience.gallery, scroll: this.scroll })
+
+    // Background music
+    this.music = new Music()
 
     // Progress bar fill element (populated after DOM is ready)
     this.progressBarFill = null
@@ -134,6 +138,8 @@ class Engine {
       this.initPresentToggle()
       this.cursor.init(this.camera)
       this.progressBarFill = document.querySelector('.progress-bar__fill')
+      this.music.init()
+      this.initMuteButton()
       this.isInitialized = true
       this.start()
       await sleep(Math.max(0, 1600 - (performance.now() - renderStart)))
@@ -213,6 +219,24 @@ class Engine {
     this.arrowDownBtn.disabled = current <= 0
   }
 
+  initMuteButton() {
+    const btn = document.querySelector('.mute-btn')
+    if (!btn) return
+    this.muteBtn = btn
+
+    const updateIcon = (isMuted) => {
+      btn.dataset.muted = isMuted ? 'true' : 'false'
+      btn.setAttribute('aria-label', isMuted ? 'Unmute music' : 'Mute music')
+    }
+
+    this.music.onMuteChange = updateIcon
+    updateIcon(true) // start muted
+
+    btn.addEventListener('click', () => {
+      this.music.toggle()
+    })
+  }
+
   updateProgressBar() {
     if (!this.progressBarFill) return
     const { minCameraZ, maxCameraZ } = this.scroll
@@ -280,6 +304,7 @@ class Engine {
     this.scroll.update()
     this.experience.update(time, this.camera, this.scroll)
     this.cursor.update()
+    this.music.update()
     this.updateArrows()
     this.updateProgressBar()
 
@@ -343,6 +368,7 @@ class Engine {
     document.removeEventListener('fullscreenchange', this.onFullscreenChange)
     this.scroll.dispose()
     this.cursor.dispose()
+    this.music.dispose()
 
     this.preloadedTextures.forEach((texture) => {
       texture.dispose()
