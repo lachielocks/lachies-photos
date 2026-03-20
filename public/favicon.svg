@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background -->
+  <rect width="100" height="100" fill="#0d0b10"/>
+
+  <!-- Decorative border -->
+  <rect x="5" y="5" width="90" height="90" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+
+  <!-- L — small, upper left -->
+  <text
+    x="24" y="52"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="36"
+    font-style="italic"
+    fill="rgba(255,255,255,0.75)"
+    text-anchor="middle"
+  >L</text>
+
+  <!-- T — large, centre -->
+  <text
+    x="52" y="76"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="68"
+    font-style="italic"
+    fill="white"
+    text-anchor="middle"
+  >T</text>
+
+  <!-- P — small, lower right -->
+  <text
+    x="80" y="80"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="36"
+    font-style="italic"
+    fill="rgba(255,255,255,0.75)"
+    text-anchor="middle"
+  >P</text>
+</svg>

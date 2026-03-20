@@ -278,6 +278,22 @@ class Scroll {
     this.isDebugBound = true
   }
 
+  navigateRelative(delta) {
+    const blendData = this.gallery.getPlaneBlendData(this.camera.position.z)
+    if (!blendData) return
+    const currentIndex =
+      blendData.blend >= 0.5 ? blendData.nextPlaneIndex : blendData.currentPlaneIndex
+    const targetIndex = Math.max(0, Math.min(this.gallery.planes.length - 1, currentIndex + delta))
+    this.navigateToPlane(targetIndex)
+  }
+
+  navigateToPlane(index) {
+    const plane = this.gallery.planes[index]
+    if (!plane) return
+    const targetCameraZ = plane.position.z + this.gallery.planeGap * this.gallery.planeFadeSampleOffset
+    this.scrollTarget = this.scrollFromCameraZ(targetCameraZ)
+  }
+
   dispose() {
     window.removeEventListener('wheel', this.onWheel)
     window.removeEventListener('touchstart', this.onTouchStart)

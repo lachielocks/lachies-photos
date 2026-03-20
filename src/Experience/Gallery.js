@@ -110,15 +110,18 @@ class Gallery {
 
   getPlaneLabelData(planeDefinition, index) {
     const fallback = {
-      word: `tone ${String(index + 1).padStart(2, '0')}`,
-      pms: 'N/A',
+      word: `photo ${String(index + 1).padStart(2, '0')}`,
       color: '',
     }
     const label = planeDefinition.label || fallback
 
     return {
       word: label.word || fallback.word,
-      pms: label.pms || fallback.pms,
+      description: label.description || '',
+      iso: label.iso || '',
+      av: label.av || '',
+      tv: label.tv || '',
+      focal: label.focal || '',
       color: label.color || fallback.color,
     }
   }

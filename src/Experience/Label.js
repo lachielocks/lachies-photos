@@ -5,11 +5,12 @@ class Label {
     this.overlayElement = null
     this.leftIndexElement = null
     this.wordElement = null
+    this.descriptionElement = null
     this.chipElement = null
-    this.cmykValueElement = null
-    this.rgbValueElement = null
-    this.hexValueElement = null
-    this.pmsValueElement = null
+    this.isoValueElement = null
+    this.avValueElement = null
+    this.tvValueElement = null
+    this.focalValueElement = null
     this.activePlaneIndex = -1
   }
 
@@ -20,25 +21,26 @@ class Label {
       <div class="plane-label-overlay__left">
         <p class="plane-label-overlay__index"></p>
         <p class="plane-label-card__word"></p>
+        <p class="plane-label-card__description"></p>
         <span class="plane-label-overlay__chip"></span>
       </div>
       <article class="plane-label-card plane-label-overlay__right">
         <dl class="plane-label-card__specs">
           <div class="plane-label-card__row">
-            <dt>CMYK</dt>
-            <dd class="plane-label-card__value plane-label-card__value--cmyk"></dd>
+            <dt>ISO</dt>
+            <dd class="plane-label-card__value plane-label-card__value--iso"></dd>
           </div>
           <div class="plane-label-card__row">
-            <dt>RGB</dt>
-            <dd class="plane-label-card__value plane-label-card__value--rgb"></dd>
+            <dt>AV</dt>
+            <dd class="plane-label-card__value plane-label-card__value--av"></dd>
           </div>
           <div class="plane-label-card__row">
-            <dt>HEX</dt>
-            <dd class="plane-label-card__value plane-label-card__value--hex"></dd>
+            <dt>TV</dt>
+            <dd class="plane-label-card__value plane-label-card__value--tv"></dd>
           </div>
           <div class="plane-label-card__row">
-            <dt>PMS</dt>
-            <dd class="plane-label-card__value plane-label-card__value--pms"></dd>
+            <dt>FOCAL</dt>
+            <dd class="plane-label-card__value plane-label-card__value--focal"></dd>
           </div>
         </dl>
       </article>
@@ -48,11 +50,12 @@ class Label {
       element,
       leftIndexElement: element.querySelector('.plane-label-overlay__index'),
       wordElement: element.querySelector('.plane-label-card__word'),
+      descriptionElement: element.querySelector('.plane-label-card__description'),
       chipElement: element.querySelector('.plane-label-overlay__chip'),
-      cmykValueElement: element.querySelector('.plane-label-card__value--cmyk'),
-      rgbValueElement: element.querySelector('.plane-label-card__value--rgb'),
-      hexValueElement: element.querySelector('.plane-label-card__value--hex'),
-      pmsValueElement: element.querySelector('.plane-label-card__value--pms'),
+      isoValueElement: element.querySelector('.plane-label-card__value--iso'),
+      avValueElement: element.querySelector('.plane-label-card__value--av'),
+      tvValueElement: element.querySelector('.plane-label-card__value--tv'),
+      focalValueElement: element.querySelector('.plane-label-card__value--focal'),
     }
   }
 
@@ -63,21 +66,23 @@ class Label {
       element,
       leftIndexElement,
       wordElement,
+      descriptionElement,
       chipElement,
-      cmykValueElement,
-      rgbValueElement,
-      hexValueElement,
-      pmsValueElement,
+      isoValueElement,
+      avValueElement,
+      tvValueElement,
+      focalValueElement,
     } = this.createElement()
 
     this.overlayElement = element
     this.leftIndexElement = leftIndexElement
     this.wordElement = wordElement
+    this.descriptionElement = descriptionElement
     this.chipElement = chipElement
-    this.cmykValueElement = cmykValueElement
-    this.rgbValueElement = rgbValueElement
-    this.hexValueElement = hexValueElement
-    this.pmsValueElement = pmsValueElement
+    this.isoValueElement = isoValueElement
+    this.avValueElement = avValueElement
+    this.tvValueElement = tvValueElement
+    this.focalValueElement = focalValueElement
     this.overlayElement.style.opacity = '0'
 
     document.body.append(this.overlayElement)
@@ -105,55 +110,6 @@ class Label {
     return hexColor.toLowerCase()
   }
 
-  hexToRgb(hexColor) {
-    const normalizedColor = this.normalizeHexColor(hexColor).slice(1)
-    const red = Number.parseInt(normalizedColor.slice(0, 2), 16)
-    const green = Number.parseInt(normalizedColor.slice(2, 4), 16)
-    const blue = Number.parseInt(normalizedColor.slice(4, 6), 16)
-
-    return {
-      r: red,
-      g: green,
-      b: blue,
-    }
-  }
-
-  rgbToCmyk({ r, g, b }) {
-    const red = r / 255
-    const green = g / 255
-    const blue = b / 255
-    const black = 1 - Math.max(red, green, blue)
-
-    if (black >= 0.999) {
-      return { c: 0, m: 0, y: 0, k: 100 }
-    }
-
-    const cyan = ((1 - red - black) / (1 - black)) * 100
-    const magenta = ((1 - green - black) / (1 - black)) * 100
-    const yellow = ((1 - blue - black) / (1 - black)) * 100
-
-    return {
-      c: Math.round(cyan),
-      m: Math.round(magenta),
-      y: Math.round(yellow),
-      k: Math.round(black * 100),
-    }
-  }
-
-  buildColorSpecs(accentColor, pmsValue) {
-    const normalizedAccentColor = this.normalizeHexColor(accentColor)
-    const rgb = this.hexToRgb(normalizedAccentColor)
-    const cmyk = this.rgbToCmyk(rgb)
-
-    return {
-      chipHex: normalizedAccentColor,
-      cmyk: `${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}`,
-      rgb: `${rgb.r}, ${rgb.g}, ${rgb.b}`,
-      hex: normalizedAccentColor.slice(1).toUpperCase(),
-      pms: pmsValue || 'N/A',
-    }
-  }
-
   getTargetPlaneIndex(cameraZ) {
     const blendData = this.gallery.getPlaneBlendData(cameraZ)
     if (!blendData) return -1
@@ -165,15 +121,16 @@ class Label {
     if (!plane || this.activePlaneIndex === planeIndex) return
 
     const labelData = plane.userData.label || {}
-    const colorSpecs = this.buildColorSpecs(plane.userData.accentColor, labelData.pms)
+    const chipHex = this.normalizeHexColor(plane.userData.accentColor)
 
     this.leftIndexElement.textContent = String(planeIndex + 1).padStart(2, '0')
-    this.wordElement.textContent = labelData.word || 'tone'
-    this.chipElement.style.backgroundColor = colorSpecs.chipHex
-    this.cmykValueElement.textContent = colorSpecs.cmyk
-    this.rgbValueElement.textContent = colorSpecs.rgb
-    this.hexValueElement.textContent = colorSpecs.hex
-    this.pmsValueElement.textContent = colorSpecs.pms
+    this.wordElement.textContent = labelData.word || ''
+    this.descriptionElement.textContent = labelData.description || ''
+    this.chipElement.style.backgroundColor = chipHex
+    this.isoValueElement.textContent = labelData.iso || '—'
+    this.avValueElement.textContent = labelData.av || '—'
+    this.tvValueElement.textContent = labelData.tv || '—'
+    this.focalValueElement.textContent = labelData.focal || '—'
     this.overlayElement.style.color = labelData.color || ''
 
     this.activePlaneIndex = planeIndex
@@ -201,11 +158,12 @@ class Label {
     this.overlayElement = null
     this.leftIndexElement = null
     this.wordElement = null
+    this.descriptionElement = null
     this.chipElement = null
-    this.cmykValueElement = null
-    this.rgbValueElement = null
-    this.hexValueElement = null
-    this.pmsValueElement = null
+    this.isoValueElement = null
+    this.avValueElement = null
+    this.tvValueElement = null
+    this.focalValueElement = null
     this.activePlaneIndex = -1
   }
 }

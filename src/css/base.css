@@ -122,6 +122,18 @@ a {
   transition: color 520ms ease;
 }
 
+body.is-presenting .frame::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7rem;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 .frame {
   padding: 3rem var(--page-padding) 0;
   display: grid;
@@ -131,13 +143,9 @@ a {
   grid-column-gap: 2rem;
   pointer-events: none;
   justify-items: start;
-  grid-template-columns: auto auto auto 1fr;
-  grid-template-areas:
-    'title title title title'
-    'back archive github ...'
-    'credit credit credit credit'
-    'tags tags tags tags'
-    'sponsor sponsor sponsor sponsor';
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas: 'title present-toggle menu-toggle';
+  column-gap: 1.5rem;
 
   #cdawrap {
     justify-self: start;
@@ -170,33 +178,47 @@ a {
     grid-area: github;
   }
 
-  .frame__tags {
-    grid-area: tags;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .frame__demos {
-    grid-area: demos;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .frame__credit {
-    grid-area: credit;
-    margin: 0;
-    opacity: 0.78;
-    font-size: 0.78rem;
-    font-weight: 500;
+  .frame__present-toggle {
+    grid-area: present-toggle;
+    justify-self: end;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-family: var(--ui-font);
+    font-size: inherit;
+    text-transform: uppercase;
     letter-spacing: var(--ui-tracking);
-    line-height: 1.2;
-    text-align: right;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 200ms ease;
+
+    &:hover {
+      opacity: 0.6;
+    }
   }
 
-  .frame__credit p {
-    margin-bottom: 0;
+  .frame__menu-toggle {
+    grid-area: menu-toggle;
+    justify-self: end;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-family: var(--ui-font);
+    font-size: inherit;
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 400ms ease;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+
+  body.is-presenting .frame__menu-toggle {
+    opacity: 0;
+    pointer-events: none;
   }
 
   @media screen and (min-width: 53em) {
@@ -206,12 +228,12 @@ a {
     top: 0;
     left: 0;
     width: 100%;
-    grid-template-columns: auto auto auto auto 1fr;
-    grid-template-rows: auto auto;
-    align-content: space-between;
+    grid-template-columns: 1fr auto auto;
+    grid-template-rows: auto;
+    align-content: start;
+    column-gap: 1.5rem;
     grid-template-areas:
-      'title back github archive sponsor'
-      'tags tags tags credit credit';
+      'title present-toggle menu-toggle';
 
     .frame__tags {
       align-self: end;

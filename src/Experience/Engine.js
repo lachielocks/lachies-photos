@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 import { world } from '@/Experience/'
 import { Scroll } from '@/Experience/Scroll'
+import { Nav } from '@/Experience/Nav'
 
 class Engine {
   constructor(canvas, experience = world) {
@@ -30,6 +31,12 @@ class Engine {
     // Scroll
     this.scroll = new Scroll(this.camera, this.experience.gallery, this.debug)
 
+    // Nav
+    this.nav = new Nav()
+
+    // Present mode
+    this.isPresentMode = false
+
     // Renderer
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -42,10 +49,34 @@ class Engine {
     this.onResize = () => {
       this.resize()
     }
+    this.onFullscreenChange = () => {
+      if (!document.fullscreenElement && this.isPresentMode) {
+        this.isPresentMode = false
+        document.body.classList.remove('is-presenting')
+        if (this.presentToggleBtn) this.presentToggleBtn.textContent = 'Present'
+      }
+    }
     this.onKeyDown = (event) => {
       if (event.repeat) return
-      if (event.key.toLowerCase() !== 'd') return
-      this.setDebugUiVisible(!this.isDebugUiVisible)
+      if (event.key.toLowerCase() === 'd') {
+        this.setDebugUiVisible(!this.isDebugUiVisible)
+        return
+      }
+      if (event.key.toLowerCase() === 'p') {
+        this.togglePresentMode()
+        return
+      }
+      if (event.key === 'Escape' && this.isPresentMode) {
+        this.togglePresentMode()
+        return
+      }
+      if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+        event.preventDefault()
+        this.scroll.navigateRelative(1)
+      } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
+        event.preventDefault()
+        this.scroll.navigateRelative(-1)
+      }
     }
 
     this.animate = this.update.bind(this)
@@ -69,13 +100,62 @@ class Engine {
       this.resize()
       window.addEventListener('resize', this.onResize)
       window.addEventListener('keydown', this.onKeyDown)
+      document.addEventListener('fullscreenchange', this.onFullscreenChange)
       this.scroll.bindEvents()
+
+      this.nav.init((index) => this.scroll.navigateToPlane(index))
+      this.initArrows()
+      this.initPresentToggle()
 
       this.isInitialized = true
       this.start()
     } finally {
       document.body.classList.remove('loading')
     }
+  }
+
+  initPresentToggle() {
+    this.presentToggleBtn = document.querySelector('.frame__present-toggle')
+    this.presentToggleBtn?.addEventListener('click', () => this.togglePresentMode())
+  }
+
+  togglePresentMode() {
+    this.isPresentMode = !this.isPresentMode
+    if (this.isPresentMode && this.nav.isOpen) {
+      this.nav.close()
+    }
+    document.body.classList.toggle('is-presenting', this.isPresentMode)
+    if (this.presentToggleBtn) {
+      this.presentToggleBtn.textContent = this.isPresentMode ? 'Exit' : 'Present'
+    }
+    if (this.isPresentMode) {
+      document.documentElement.requestFullscreen?.().catch(() => {})
+    } else if (document.fullscreenElement) {
+      document.exitFullscreen?.()
+    }
+  }
+
+  initArrows() {
+    const upBtn = document.querySelector('.gallery-arrows__btn--up')
+    const downBtn = document.querySelector('.gallery-arrows__btn--down')
+    if (!upBtn || !downBtn) return
+
+    upBtn.addEventListener('click', () => this.scroll.navigateRelative(1))
+    downBtn.addEventListener('click', () => this.scroll.navigateRelative(-1))
+
+    this.arrowUpBtn = upBtn
+    this.arrowDownBtn = downBtn
+  }
+
+  updateArrows() {
+    if (!this.arrowUpBtn || !this.arrowDownBtn) return
+    const total = this.experience.gallery.planes.length
+    const blendData = this.experience.gallery.getPlaneBlendData(this.camera.position.z)
+    if (!blendData) return
+    const current =
+      blendData.blend >= 0.5 ? blendData.nextPlaneIndex : blendData.currentPlaneIndex
+    this.arrowUpBtn.disabled = current >= total - 1
+    this.arrowDownBtn.disabled = current <= 0
   }
 
   start() {
@@ -130,6 +210,7 @@ class Engine {
 
     this.scroll.update()
     this.experience.update(time, this.camera, this.scroll)
+    this.updateArrows()
 
     this.renderer.clear(true, true, true)
     this.experience.background.render(this.renderer)
@@ -188,6 +269,7 @@ class Engine {
 
     window.removeEventListener('resize', this.onResize)
     window.removeEventListener('keydown', this.onKeyDown)
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange)
     this.scroll.dispose()
 
     this.preloadedTextures.forEach((texture) => {
@@ -196,6 +278,7 @@ class Engine {
     this.preloadedTextures.clear()
     this.stats?.dom.remove()
     this.stats = null
+    this.nav.dispose()
     this.experience.dispose?.()
   }
 }
