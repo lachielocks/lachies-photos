@@ -1,6 +1,48 @@
 import * as THREE from 'three'
 import { galleryPlaneData } from '@/data/galleryData'
 
+const PLANE_VERTEX = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+// 3×3 box-blur kernel driven by uBlur (0=sharp, 1=full blur)
+// Used to fake depth-of-field as planes fade in/out
+const PLANE_FRAGMENT = /* glsl */ `
+  uniform sampler2D uMap;
+  uniform vec3 uColor;
+  uniform float uHasTexture;
+  uniform float uOpacity;
+  uniform float uBlur;
+  varying vec2 vUv;
+
+  void main() {
+    vec4 texColor;
+    if (uHasTexture > 0.5) {
+      if (uBlur > 0.001) {
+        float r = uBlur * 0.030;
+        texColor  = texture2D(uMap, vUv + vec2(-r, -r)) * 0.0625;
+        texColor += texture2D(uMap, vUv + vec2( 0., -r)) * 0.125;
+        texColor += texture2D(uMap, vUv + vec2( r, -r)) * 0.0625;
+        texColor += texture2D(uMap, vUv + vec2(-r,  0.)) * 0.125;
+        texColor += texture2D(uMap, vUv             ) * 0.25;
+        texColor += texture2D(uMap, vUv + vec2( r,  0.)) * 0.125;
+        texColor += texture2D(uMap, vUv + vec2(-r,  r)) * 0.0625;
+        texColor += texture2D(uMap, vUv + vec2( 0.,  r)) * 0.125;
+        texColor += texture2D(uMap, vUv + vec2( r,  r)) * 0.0625;
+      } else {
+        texColor = texture2D(uMap, vUv);
+      }
+    } else {
+      texColor = vec4(uColor, 1.0);
+    }
+    gl_FragColor = vec4(texColor.rgb, texColor.a * uOpacity);
+  }
+`
+
 class Gallery {
   constructor(debug = null) {
     this.isInitialized = false
@@ -18,6 +60,11 @@ class Gallery {
     this.mobileBreakpoint = 768
     this.planeConfig = galleryPlaneData
     this.moodSampleOffset = 1
+
+    // 1×1 white placeholder so ShaderMaterial always has a valid sampler
+    const placeholderData = new Uint8Array([255, 255, 255, 255])
+    this.placeholderTexture = new THREE.DataTexture(placeholderData, 1, 1, THREE.RGBAFormat)
+    this.placeholderTexture.needsUpdate = true
     this.planeFadeSampleOffset = 1
     this.planeFadeSmoothing = 0.14
 
@@ -102,13 +149,20 @@ class Gallery {
       const blob1Color = plane.blob1Color || fallbackColor
       const blob2Color = plane.blob2Color || fallbackColor
       const labelData = this.getPlaneLabelData(plane, this.planes.length)
-      const planeMaterial = new THREE.MeshBasicMaterial({
-        color: fallbackColor,
-        map: texture,
-        side: THREE.DoubleSide,
+      const hasTexture = Boolean(this.useTextures && texture)
+      const planeMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          uMap: { value: hasTexture ? texture : this.placeholderTexture },
+          uColor: { value: new THREE.Color(fallbackColor) },
+          uHasTexture: { value: hasTexture ? 1.0 : 0.0 },
+          uOpacity: { value: index === 0 ? 1.0 : 0.0 },
+          uBlur: { value: index === 0 ? 0.0 : 1.0 },
+        },
+        vertexShader: PLANE_VERTEX,
+        fragmentShader: PLANE_FRAGMENT,
         transparent: true,
+        side: THREE.DoubleSide,
         depthWrite: false,
-        opacity: index === 0 ? 1 : 0,
       })
       const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
       planeMesh.userData.basePosition = plane.position
@@ -295,13 +349,13 @@ class Gallery {
 
   updatePlaneMaterialMode() {
     this.planes.forEach((plane) => {
-      const planeMaterial = plane.material
+      const uni = plane.material.uniforms
       const texture = plane.userData.texture || null
-      const hasTexture = Boolean(texture)
+      const showTexture = Boolean(this.useTextures && texture)
 
-      planeMaterial.map = this.useTextures && hasTexture ? texture : null
-      planeMaterial.color.set(this.useTextures && hasTexture ? '#ffffff' : plane.userData.baseColor)
-      planeMaterial.needsUpdate = true
+      uni.uMap.value = showTexture ? texture : this.placeholderTexture
+      uni.uHasTexture.value = showTexture ? 1.0 : 0.0
+      uni.uColor.value.set(showTexture ? '#ffffff' : plane.userData.baseColor)
     })
   }
 
@@ -445,13 +499,16 @@ class Gallery {
         targetOpacity = Math.max(targetOpacity, blend)
       }
 
-      const currentOpacity = Number.isFinite(plane.material.opacity) ? plane.material.opacity : 0
-      plane.material.opacity = THREE.MathUtils.lerp(
-        currentOpacity,
+      const uni = plane.material.uniforms
+      uni.uOpacity.value = THREE.MathUtils.lerp(
+        uni.uOpacity.value,
         targetOpacity,
         this.planeFadeSmoothing
       )
-      plane.material.needsUpdate = true
+      // Blur inversely follows opacity with a power curve so blur is
+      // only noticeable when a plane is nearly off-screen (DoF effect)
+      const targetBlur = Math.pow(1.0 - targetOpacity, 2)
+      uni.uBlur.value = THREE.MathUtils.lerp(uni.uBlur.value, targetBlur, this.planeFadeSmoothing)
     })
   }
 
@@ -495,7 +552,7 @@ class Gallery {
       const xPosition = basePosition.x * xSpreadFactor
       const yPosition = basePosition.y
       const zPosition = -index * this.planeGap
-      const opacity = Number.isFinite(plane.material.opacity) ? plane.material.opacity : 0
+      const opacity = plane.material.uniforms?.uOpacity?.value ?? 0
       const depthInfluence = 1 + index * 0.05
       const parallaxInfluence = this.parallaxEnabled ? opacity * depthInfluence : 0
 

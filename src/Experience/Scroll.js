@@ -41,6 +41,11 @@ class Scroll {
     this.velocityVisualizerFillElement = null
     this.velocityVisualizerValueElement = null
 
+    // Expand mode — locks camera to a specific Z (click-to-expand)
+    this.expandActive = false
+    this.expandTargetZ = 0
+    this.expandCurrentZ = 0
+
     // Input events
     this.onWheel = (event) => {
       event.preventDefault()
@@ -108,7 +113,18 @@ class Scroll {
     return event.deltaY
   }
 
+  setExpandZ(targetZ) {
+    this.expandActive = true
+    this.expandTargetZ = targetZ
+    this.expandCurrentZ = this.camera.position.z
+  }
+
+  clearExpand() {
+    this.expandActive = false
+  }
+
   addScrollInput(deltaY) {
+    if (this.expandActive) return // swallow scroll input while expanded
     const scrollDirection = this.invertScroll ? -1 : 1
     this.scrollTarget += deltaY * scrollDirection
   }
@@ -197,6 +213,16 @@ class Scroll {
   }
 
   update() {
+    // Expand mode: lerp camera toward the expanded position, skip scroll
+    if (this.expandActive) {
+      this.expandCurrentZ = THREE.MathUtils.lerp(this.expandCurrentZ, this.expandTargetZ, 0.07)
+      this.camera.position.z = this.expandCurrentZ
+      this.velocity = THREE.MathUtils.lerp(this.velocity, 0, this.velocityDamping)
+      this.previousScrollCurrent = this.scrollCurrent
+      this.updateVelocityVisualizer()
+      return
+    }
+
     this.updateCameraBounds()
     this.scrollCurrent = THREE.MathUtils.lerp(
       this.scrollCurrent,
