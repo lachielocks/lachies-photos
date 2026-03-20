@@ -86,22 +86,22 @@ class Engine {
     if (this.isInitialized) return
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 
     try {
-      // Step 1 — Loading Environment (minimum 1s)
+      // Step 1 — Loading Environment (minimum 500ms)
       this.setLoadingStep('environment', 'active')
       const envStart = performance.now()
-      // (environment is constructed synchronously; pad to 1s for UX)
-      await sleep(Math.max(0, 1000 - (performance.now() - envStart)))
+      await sleep(Math.max(0, 500 - (performance.now() - envStart)))
 
-      // Step 2 — Loading Photos (real progress, minimum 1s)
+      // Step 2 — Loading Photos (real progress, minimum 500ms)
       this.setLoadingStep('environment', 'done')
       this.setLoadingStep('photos', 'active')
       const photosStart = performance.now()
       this.preloadedTextures = await this.preloadTextures()
-      await sleep(Math.max(0, 1000 - (performance.now() - photosStart)))
+      await sleep(Math.max(0, 500 - (performance.now() - photosStart)))
 
-      // Step 3 — Rendering (minimum 1s)
+      // Step 3 — Rendering (minimum 500ms)
       this.setLoadingStep('photos', 'done')
       this.setLoadingStep('rendering', 'active')
       const renderStart = performance.now()
@@ -121,14 +121,19 @@ class Engine {
       this.initPresentToggle()
       this.isInitialized = true
       this.start()
-      await sleep(Math.max(0, 1000 - (performance.now() - renderStart)))
+      await sleep(Math.max(0, 500 - (performance.now() - renderStart)))
 
       // All done — brief pause showing all ticks
       this.setLoadingStep('rendering', 'done')
-      await sleep(600)
+      await sleep(400)
     } finally {
+      // Start the intro offset BEFORE the loading screen fades so there's
+      // no flash of the plane at its final position
+      this.experience.gallery?.startIntroAnimation()
+      await nextFrame()
+      await nextFrame()
+      document.body.classList.add('is-ready')
       this.hideLoadingScreen()
-      this.playIntroAnimation()
     }
   }
 
@@ -147,12 +152,6 @@ class Engine {
     if (!screen) return
     screen.classList.add('is-hidden')
     screen.addEventListener('transitionend', () => screen.remove(), { once: true })
-  }
-
-  playIntroAnimation() {
-    document.body.classList.add('is-ready')
-    // Slight delay so the photo slides in as the loading screen finishes fading
-    setTimeout(() => this.experience.gallery?.startIntroAnimation(), 200)
   }
 
   initPresentToggle() {
