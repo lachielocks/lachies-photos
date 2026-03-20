@@ -568,6 +568,7 @@ class Gallery {
 
     // Per-plane: position, rotation, scale
     const xSpreadFactor = this.getXSpreadFactor()
+    const isExpanded = this.expandedPlaneIndex >= 0
 
     this.planes.forEach((plane, index) => {
       const basePosition = plane.userData.basePosition || { x: 0, y: 0 }
@@ -575,16 +576,19 @@ class Gallery {
       const yPosition = basePosition.y
       const zPosition = -index * this.planeGap
       const opacity = plane.material.uniforms?.uOpacity?.value ?? 0
-      const depthInfluence = 1 + index * 0.05
-      const parallaxInfluence = this.parallaxEnabled ? opacity * depthInfluence : 0
 
-      const parallaxOffsetX = this.pointerCurrent.x * this.parallaxAmountX * parallaxInfluence
-      const parallaxOffsetY = this.pointerCurrent.y * this.parallaxAmountY * parallaxInfluence
-      const gestureOffsetY = this.driftCurrent * this.gestureParallaxAmountY
-
-      plane.position.x = xPosition + parallaxOffsetX
-      plane.position.y = yPosition + parallaxOffsetY + gestureOffsetY
-      plane.position.z = zPosition
+      // In expand mode: lerp the active plane to centre (0,0), kill parallax/breath
+      if (isExpanded && index === this.expandedPlaneIndex) {
+        plane.position.x = THREE.MathUtils.lerp(plane.position.x, 0, 0.08)
+        plane.position.y = THREE.MathUtils.lerp(plane.position.y, 0, 0.08)
+        plane.position.z = zPosition
+        plane.rotation.set(0, 0, 0)
+        const aspectRatio = plane.userData.aspectRatio || 1
+        const baseScale =
+          window.innerWidth <= this.mobileBreakpoint ? this.mobilePlaneScale : this.desktopPlaneScale
+        plane.scale.set(baseScale * aspectRatio, baseScale, 1)
+        return
+      }
 
       if (this.introActive && index === 0) {
         const now = performance.now()
@@ -604,6 +608,17 @@ class Gallery {
 
         plane.position.x += this.introCurrentX
       }
+
+      const depthInfluence = 1 + index * 0.05
+      const parallaxInfluence = this.parallaxEnabled ? opacity * depthInfluence : 0
+
+      const parallaxOffsetX = this.pointerCurrent.x * this.parallaxAmountX * parallaxInfluence
+      const parallaxOffsetY = this.pointerCurrent.y * this.parallaxAmountY * parallaxInfluence
+      const gestureOffsetY = this.driftCurrent * this.gestureParallaxAmountY
+
+      plane.position.x = xPosition + parallaxOffsetX
+      plane.position.y = yPosition + parallaxOffsetY + gestureOffsetY
+      plane.position.z = zPosition
 
       const breathInfluence = this.breathEnabled ? this.breathIntensity * opacity : 0
       const tiltX = -this.pointerCurrent.y * this.breathTiltAmount * breathInfluence
