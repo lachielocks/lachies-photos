@@ -45,6 +45,12 @@ class Gallery {
     this.driftCurrent = 0
     this.driftTarget = 0
 
+    // Intro animation
+    this.introActive = false
+    this.introStartTime = 0
+    this.introDuration = 1000
+    this.introStartOffsetX = 5.5
+
     // Pointer events
     this.onPointerMove = (event) => {
       const x = (event.clientX / window.innerWidth) * 2 - 1
@@ -54,6 +60,12 @@ class Gallery {
     this.onPointerLeave = () => {
       this.pointerTarget.set(0, 0)
     }
+  }
+
+  startIntroAnimation() {
+    if (!this.isInitialized) return
+    this.introActive = true
+    this.introStartTime = performance.now()
   }
 
   async init(scene) {
@@ -489,6 +501,15 @@ class Gallery {
       plane.position.x = xPosition + parallaxOffsetX
       plane.position.y = yPosition + parallaxOffsetY + gestureOffsetY
       plane.position.z = zPosition
+
+      if (this.introActive && index === 0) {
+        const elapsed = performance.now() - this.introStartTime
+        const t = Math.min(elapsed / this.introDuration, 1)
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - t, 3)
+        plane.position.x += this.introStartOffsetX * (1 - eased)
+        if (t >= 1) this.introActive = false
+      }
 
       const breathInfluence = this.breathEnabled ? this.breathIntensity * opacity : 0
       const tiltX = -this.pointerCurrent.y * this.breathTiltAmount * breathInfluence
