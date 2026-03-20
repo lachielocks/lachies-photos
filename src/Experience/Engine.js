@@ -230,11 +230,39 @@ class Engine {
     }
 
     this.music.onMuteChange = updateIcon
+    this.music.onTrackChange = (name) => this.showNowPlayingToast(name)
     updateIcon(true) // start muted
 
     btn.addEventListener('click', () => {
       this.music.toggle()
     })
+  }
+
+  showNowPlayingToast(trackName) {
+    // Remove any existing toast immediately
+    const existing = document.querySelector('.now-playing-toast')
+    if (existing) existing.remove()
+
+    const toast = document.createElement('div')
+    toast.className = 'now-playing-toast'
+    toast.innerHTML = `
+      <span class="now-playing-toast__label">Now Playing</span>
+      <span class="now-playing-toast__title">${trackName}</span>
+      <span class="now-playing-toast__artist">by Lachie Thurlow</span>
+    `
+    document.body.appendChild(toast)
+
+    // Trigger enter animation next frame
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => toast.classList.add('is-visible'))
+    })
+
+    // Auto-dismiss after 4 s
+    clearTimeout(this._toastTimer)
+    this._toastTimer = setTimeout(() => {
+      toast.classList.remove('is-visible')
+      toast.addEventListener('transitionend', () => toast.remove(), { once: true })
+    }, 4000)
   }
 
   updateProgressBar() {

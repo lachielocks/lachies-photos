@@ -1,36 +1,62 @@
 /**
- * Music.js — background audio player with smooth volume fade.
- * Drop an audio file at public/audio/background.mp3 to activate.
+ * Music.js — multi-track background audio player with smooth volume fade.
+ * Tracks live at public/audio/{name}.mp3
  */
 class Music {
   constructor() {
     this.audio = null
     this.isMuted = true
-    this.isLoaded = false
     this.targetVolume = 0
     this.currentVolume = 0
     this.masterVolume = 0.55
-    this.src = '/audio/background.mp3'
-    this.onMuteChange = null // optional callback(isMuted)
+    this.currentTrackIndex = 0
+
+    this.tracks = [
+      { name: 'Anchor', src: '/audio/Anchor.mp3' },
+      { name: 'Bypass', src: '/audio/Bypass.mp3' },
+      { name: 'Cave In', src: '/audio/Cave%20In.mp3' },
+    ]
+
+    // Callbacks
+    this.onMuteChange = null   // (isMuted: boolean) => void
+    this.onTrackChange = null  // (trackName: string) => void
+  }
+
+  get currentTrack() {
+    return this.tracks[this.currentTrackIndex]
   }
 
   init() {
     this.audio = new Audio()
-    this.audio.loop = true
+    this.audio.loop = false
     this.audio.volume = 0
     this.audio.preload = 'auto'
 
-    this.audio.addEventListener('canplaythrough', () => {
-      this.isLoaded = true
+    this.audio.addEventListener('ended', () => {
+      this.advanceTrack()
     })
 
-    // Silently swallow load errors (file might not exist yet)
     this.audio.addEventListener('error', () => {
-      this.isLoaded = false
+      // File missing or format unsupported — fail silently
     })
 
-    this.audio.src = this.src
+    this.loadTrack(this.currentTrackIndex, false)
+  }
+
+  loadTrack(index, andPlay = false) {
+    this.currentTrackIndex = index % this.tracks.length
+    if (!this.audio) return
+    this.audio.src = this.currentTrack.src
     this.audio.load()
+    if (andPlay) {
+      this.audio.play().catch(() => {})
+      this.onTrackChange?.(this.currentTrack.name)
+    }
+  }
+
+  advanceTrack() {
+    const next = (this.currentTrackIndex + 1) % this.tracks.length
+    this.loadTrack(next, !this.isMuted)
   }
 
   toggle() {
@@ -46,15 +72,19 @@ class Music {
     if (!this.audio) return
     this.isMuted = false
     this.targetVolume = this.masterVolume
+
     if (this.audio.paused) {
       this.audio.play().catch(() => {
-        // Autoplay policy blocked — silently revert
+        // Autoplay policy blocked — revert silently
         this.isMuted = true
         this.targetVolume = 0
         this.onMuteChange?.(true)
+        return
       })
     }
+
     this.onMuteChange?.(false)
+    this.onTrackChange?.(this.currentTrack.name)
   }
 
   mute() {
@@ -66,8 +96,6 @@ class Music {
 
   update() {
     if (!this.audio) return
-
-    // Smooth exponential fade toward target
     const delta = this.targetVolume - this.currentVolume
     if (Math.abs(delta) > 0.0005) {
       this.currentVolume += delta * 0.04
@@ -75,7 +103,6 @@ class Music {
     } else {
       this.currentVolume = this.targetVolume
       this.audio.volume = this.targetVolume
-      // Pause when fully faded to free decoder resources
       if (this.targetVolume === 0 && !this.audio.paused) {
         this.audio.pause()
       }
