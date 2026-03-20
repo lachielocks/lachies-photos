@@ -71,6 +71,7 @@ class Cursor {
     this.gallery.expandedPlaneIndex = planeIndex
     // Move camera close to the plane — 3.8 units away fills ~95% of screen height
     this.scroll.setExpandZ(plane.position.z + 3.8)
+    document.body.classList.remove('is-collapsing')
     document.body.classList.add('is-expanded')
   }
 
@@ -78,7 +79,10 @@ class Cursor {
     this.isExpanded = false
     this.gallery.expandedPlaneIndex = -1
     this.scroll.clearExpand()
+    document.body.classList.add('is-collapsing')
     document.body.classList.remove('is-expanded')
+    clearTimeout(this._collapseTimer)
+    this._collapseTimer = setTimeout(() => document.body.classList.remove('is-collapsing'), 550)
   }
 
   /** Returns true if the DOM element under the cursor is a UI overlay (nav, buttons, etc.) */

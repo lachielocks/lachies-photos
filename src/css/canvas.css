@@ -96,13 +96,13 @@ body.is-presenting {
   position: fixed;
   right: clamp(1rem, 3vw, 2.5rem);
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateX(0);
   z-index: 200;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   opacity: 1;
-  transition: opacity 400ms ease;
+  transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.is-presenting .gallery-arrows {
@@ -233,7 +233,7 @@ body.is-presenting .gallery-arrows {
   inset: 0;
   z-index: 80;
   pointer-events: none;
-  transition: opacity 260ms ease;
+  transition: opacity 340ms cubic-bezier(0.4, 0, 0.2, 1), transform 340ms cubic-bezier(0.4, 0, 0.2, 1);
   color: rgba(244, 244, 244, 0.92);
 }
 
@@ -462,16 +462,59 @@ body.is-presenting .plane-label-card {
   opacity: 1;
 }
 
-/* Full-focus expand: hide all chrome, centre the image */
-body.is-expanded .plane-label-overlay,
-body.is-expanded .gallery-arrows,
-body.is-expanded .frame,
-body.is-expanded .progress-bar,
-body.is-expanded .mute-btn,
+/* Full-focus expand: hide all chrome with directional exits */
+body.is-expanded .frame {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+body.is-expanded .gallery-arrows {
+  opacity: 0;
+  transform: translateY(-50%) translateX(14px);
+  pointer-events: none;
+}
+
+body.is-expanded .plane-label-overlay {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+body.is-expanded .progress-bar {
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+}
+
+body.is-expanded .mute-btn {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
 body.is-expanded .now-playing-toast {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 400ms ease;
+}
+
+/* Canvas scale animation on expand / collapse */
+@keyframes expandReveal {
+  from { transform: scale(0.97); }
+  to   { transform: scale(1); }
+}
+
+@keyframes collapseRetreat {
+  from { transform: scale(1.025); }
+  to   { transform: scale(1); }
+}
+
+body.is-expanded .webgl {
+  animation: expandReveal 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+body.is-collapsing .webgl {
+  animation: collapseRetreat 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 /* =====================================================
@@ -487,6 +530,7 @@ body.is-expanded .now-playing-toast {
   background: rgba(255, 255, 255, 0.06);
   z-index: 200;
   pointer-events: none;
+  transition: opacity 300ms ease, transform 300ms ease;
 }
 
 .progress-bar__fill {
@@ -515,7 +559,9 @@ body.is-expanded .now-playing-toast {
   justify-content: center;
   transition:
     color 200ms ease,
-    border-color 200ms ease;
+    border-color 200ms ease,
+    opacity 320ms ease,
+    transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
 
   svg {
     width: 1rem;
