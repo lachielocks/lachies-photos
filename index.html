@@ -11,9 +11,19 @@
   <script>
     document.documentElement.className = 'js'
   </script>
+  <style>html { background: #08080c; }</style>
 </head>
 
 <body class="demo-1">
+  <div id="loading-screen" aria-label="Loading gallery">
+    <p id="loading-title">Lachie's Photos</p>
+    <div id="loading-progress">
+      <div id="loading-bar">
+        <div id="loading-bar-fill"></div>
+      </div>
+      <span id="loading-counter">0 / 0</span>
+    </div>
+  </div>
   <main>
     <header class="frame">
       <h1 class="frame__title">Lachie's Photos</h1>
