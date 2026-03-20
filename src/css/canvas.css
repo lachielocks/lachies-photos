@@ -390,3 +390,161 @@ body.is-presenting .plane-label-card {
     font-size: 9px;
   }
 }
+
+/* =====================================================
+   CUSTOM CURSOR
+   ===================================================== */
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 99999;
+  will-change: transform;
+}
+
+.custom-cursor.is-offscreen {
+  opacity: 0;
+}
+
+.custom-cursor__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    width 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 320ms ease,
+    border-color 320ms ease,
+    opacity 250ms ease;
+}
+
+.custom-cursor.is-hovering .custom-cursor__ring {
+  width: 68px;
+  height: 68px;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+.custom-cursor.is-expanded-mode .custom-cursor__ring {
+  width: 58px;
+  height: 58px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+.custom-cursor__label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  font-family: var(--ui-font);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.custom-cursor.is-hovering .custom-cursor__label,
+.custom-cursor.is-expanded-mode .custom-cursor__label {
+  opacity: 1;
+}
+
+/* Hide label + arrows when expanded */
+body.is-expanded .plane-label-overlay,
+body.is-expanded .gallery-arrows {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* =====================================================
+   PROGRESS BAR
+   ===================================================== */
+
+.progress-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  z-index: 200;
+  pointer-events: none;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+/* =====================================================
+   MUTE BUTTON
+   ===================================================== */
+
+.mute-btn {
+  position: fixed;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  right: max(1.5rem, env(safe-area-inset-right));
+  z-index: 200;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.45);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.75);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.mute-btn__tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.6rem);
+  right: 0;
+  background: rgba(8, 8, 12, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.35rem 0.65rem;
+  font-size: 9px;
+  font-family: var(--ui-font);
+  text-transform: uppercase;
+  letter-spacing: var(--ui-tracking);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(5px);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+  pointer-events: none;
+}
+
+.mute-btn:hover .mute-btn__tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}

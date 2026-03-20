@@ -3,6 +3,7 @@ import Stats from 'three/examples/jsm/libs/stats.module.js'
 import { world } from '@/Experience/'
 import { Scroll } from '@/Experience/Scroll'
 import { Nav } from '@/Experience/Nav'
+import { Cursor } from '@/Experience/Cursor'
 
 class Engine {
   constructor(canvas, experience = world) {
@@ -33,6 +34,12 @@ class Engine {
 
     // Nav
     this.nav = new Nav()
+
+    // Cursor (custom circle cursor + click-to-expand)
+    this.cursor = new Cursor({ gallery: this.experience.gallery, scroll: this.scroll })
+
+    // Progress bar fill element (populated after DOM is ready)
+    this.progressBarFill = null
 
     // Present mode
     this.isPresentMode = false
@@ -66,9 +73,15 @@ class Engine {
         this.togglePresentMode()
         return
       }
-      if (event.key === 'Escape' && this.isPresentMode) {
-        this.togglePresentMode()
-        return
+      if (event.key === 'Escape') {
+        if (this.cursor?.isExpanded) {
+          this.cursor.collapse()
+          return
+        }
+        if (this.isPresentMode) {
+          this.togglePresentMode()
+          return
+        }
       }
       if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
         event.preventDefault()
@@ -119,6 +132,8 @@ class Engine {
       this.nav.init((index) => this.scroll.navigateToPlane(index))
       this.initArrows()
       this.initPresentToggle()
+      this.cursor.init(this.camera)
+      this.progressBarFill = document.querySelector('.progress-bar__fill')
       this.isInitialized = true
       this.start()
       await sleep(Math.max(0, 1600 - (performance.now() - renderStart)))
@@ -198,6 +213,15 @@ class Engine {
     this.arrowDownBtn.disabled = current <= 0
   }
 
+  updateProgressBar() {
+    if (!this.progressBarFill) return
+    const { minCameraZ, maxCameraZ } = this.scroll
+    const range = maxCameraZ - minCameraZ
+    if (range <= 0) return
+    const progress = (maxCameraZ - this.camera.position.z) / range
+    this.progressBarFill.style.transform = `scaleX(${Math.max(0, Math.min(1, progress))})`
+  }
+
   start() {
     if (!this.isInitialized || this.isRunning) return
 
@@ -255,7 +279,9 @@ class Engine {
 
     this.scroll.update()
     this.experience.update(time, this.camera, this.scroll)
+    this.cursor.update()
     this.updateArrows()
+    this.updateProgressBar()
 
     this.renderer.clear(true, true, true)
     this.experience.background.render(this.renderer)
@@ -316,6 +342,7 @@ class Engine {
     window.removeEventListener('keydown', this.onKeyDown)
     document.removeEventListener('fullscreenchange', this.onFullscreenChange)
     this.scroll.dispose()
+    this.cursor.dispose()
 
     this.preloadedTextures.forEach((texture) => {
       texture.dispose()
