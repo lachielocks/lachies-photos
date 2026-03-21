@@ -20,14 +20,6 @@ if (!(canvas instanceof HTMLCanvasElement)) {
 
 const engine = new Engine(canvas)
 
-let introPromise = Promise.resolve()
-if (Intro.shouldPlay()) {
-  document.body.classList.add('intro-playing')
-  introPromise = new Intro().run().then(() => {
-    document.body.classList.remove('intro-playing')
-  })
-}
-
-engine.init(introPromise).catch((error) => {
+engine.init({ playIntro: Intro.shouldPlay() }).catch((error) => {
   console.error('Engine initialization failed', error)
 })
