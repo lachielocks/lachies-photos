@@ -525,11 +525,6 @@ class Engine {
         <div><dt>P</dt><dd>Present</dd></div>
         <div><dt>?</dt><dd>Shortcuts</dd></div>
       </dl>
-      <p class="shortcuts-menu__footer">
-        Created by <a href="https://lachiethurlow.com" target="_blank" rel="noopener noreferrer">Lachie Thurlow</a>.
-        Check out <a href="https://heyacosta.com" target="_blank" rel="noopener noreferrer">Acosta AI</a> and
-        <a href="https://transnology.co" target="_blank" rel="noopener noreferrer">Transnology</a>.
-      </p>
     `
     el.addEventListener('click', (e) => {
       if (e.target === el) this.closeShortcutsMenu()

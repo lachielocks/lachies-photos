@@ -257,6 +257,30 @@ body.is-presenting .gallery-arrows {
   }
 }
 
+.gallery-nav__footer {
+  position: absolute;
+  bottom: clamp(1.5rem, 4vw, 3rem);
+  left: clamp(2rem, 8vw, 10rem);
+  margin: 0;
+  font-size: 9px;
+  font-family: var(--ui-font);
+  text-transform: uppercase;
+  letter-spacing: var(--ui-tracking);
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1.8;
+}
+
+.gallery-nav__footer a {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 200ms ease;
+}
+
+.gallery-nav__footer a:hover {
+  color: #ffffff;
+}
+
 .plane-label-overlay {
   position: fixed;
   inset: 0;
