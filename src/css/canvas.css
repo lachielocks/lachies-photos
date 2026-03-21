@@ -684,24 +684,24 @@ body.is-expanded .webgl {
 .shortcuts-menu__footer {
   margin: 0.875rem 0 0;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 8px;
   font-family: var(--ui-font);
   text-transform: uppercase;
   letter-spacing: var(--ui-tracking);
-  color: rgba(255, 255, 255, 0.22);
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.7;
   max-width: 16rem;
+}
 
-  a {
-    color: rgba(255, 255, 255, 0.45);
-    text-decoration: none;
+.shortcuts-menu__footer a {
+  color: rgba(255, 255, 255, 0.7) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+}
 
-    &:hover {
-      color: rgba(255, 255, 255, 0.75);
-      text-decoration: underline;
-    }
-  }
+.shortcuts-menu__footer a:hover {
+  color: #ffffff !important;
 }
 
 /* =====================================================

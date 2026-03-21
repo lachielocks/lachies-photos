@@ -270,16 +270,17 @@ class Engine {
     const planes = this.experience.gallery?.planes ?? []
     planes.forEach((p) => { p.visible = false })
 
-    // Fade dark overlay to near-transparent, revealing the trail
+    // Fade dark overlay to near-transparent — trail becomes visible
     if (introScreen) {
       introScreen.style.transition = 'opacity 900ms cubic-bezier(0.4, 0, 1, 1)'
       introScreen.style.opacity = '0.04'
     }
 
-    // Sweep the camera forward so the trail traces its sinusoidal path
-    const sweepAmount = 1400 // ~2.8 photos — enough arc for a proper swirl
+    // Sweep all the way to the last photo, accelerating exponentially.
+    // easeInExpo: nearly still at the start, then RUSHES to the end.
     const startScroll = this.scroll.scrollCurrent ?? 0
-    const sweepDuration = 3200
+    const maxScroll = this.scroll.scrollFromCameraZ(this.scroll.minCameraZ)
+    const sweepDuration = 4000 // ms — slow start, explosive finish
 
     let skipped = false
     const skipHandler = () => { skipped = true }
@@ -291,8 +292,9 @@ class Engine {
         if (skipped) { resolve(); return }
         const elapsed = performance.now() - sweepStart
         const t = Math.min(elapsed / sweepDuration, 1)
-        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
-        this.scroll.scrollTarget = startScroll + eased * sweepAmount
+        // Exponential ease-in: creeps at first, then explodes to the end
+        const eased = t === 0 ? 0 : Math.pow(2, 10 * t - 10)
+        this.scroll.scrollTarget = startScroll + eased * (maxScroll - startScroll)
         this.scroll.scrollCurrent = this.scroll.scrollTarget
         if (t < 1) { requestAnimationFrame(tick) } else { resolve() }
       }
@@ -300,33 +302,30 @@ class Engine {
     })
 
     window.removeEventListener('keydown', skipHandler)
-    introScreen?.remove()
 
-    // ── Phase 3: white glow sucks inward to a singular point ─────────────────
-    const suckEl = document.createElement('div')
-    suckEl.className = 'intro-suck-overlay'
-    document.body.appendChild(suckEl)
-    await nextFrame()
-    await nextFrame()
-    suckEl.classList.add('is-active')
+    // ── Phase 3: white flash — the trail vanishes into blinding light ─────────
+    if (introScreen) {
+      introScreen.style.transition = 'none'
+      introScreen.style.background = '#ffffff'
+      introScreen.style.opacity = '1'
+    }
+    await sleep(60) // one-frame flash hold
 
-    // At ~650ms the suck is nearly complete — place the TV-off overlay underneath
-    // so there's zero gap between the two effects
-    await sleep(650)
+    // ── Phase 4: TV turn-off — line collapses to a dot, everything goes black ──
     const tvEl = document.createElement('div')
     tvEl.className = 'intro-tvoff-overlay'
-    document.body.appendChild(tvEl) // immediately white, covers scene
-    await sleep(100)
-    suckEl.remove()
-
-    // ── Phase 4: TV turn-off — bright line collapses to a dot ────────────────
+    document.body.appendChild(tvEl)
+    if (introScreen) introScreen.style.opacity = '0' // intro-screen no longer needed
     await nextFrame()
     await nextFrame()
     tvEl.classList.add('is-active')
-    await sleep(850) // match introTvOff duration
-    tvEl.remove()
+    await sleep(900) // match introTvOff duration
 
-    // ── Phase 5: snap scroll back to first photo, epic reveal ────────────────
+    // After TV-off completes, hold on black before the reveal
+    tvEl.remove()
+    await sleep(300)
+
+    // ── Phase 5: snap scroll to first photo, epic reveal ─────────────────────
     this.scroll.scrollTarget = startScroll
     this.scroll.scrollCurrent = startScroll
     planes.forEach((p) => { p.visible = true })
@@ -336,6 +335,7 @@ class Engine {
     await nextFrame()
     await nextFrame()
     document.body.classList.add('is-ready')
+    introScreen?.remove()
     setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
   }
 
