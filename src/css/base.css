@@ -54,19 +54,49 @@ body.frame-text-dark {
   opacity: 0;
 }
 
-#intro-screen.tv-off {
-  animation: tvTurnOff 680ms cubic-bezier(0.4, 0, 1, 1) forwards;
-  background: #ffffff;
-  filter: brightness(2);
-  transition: none;
+/* Suck-to-point overlay: large white glow shrinks into a singular bright point */
+.intro-suck-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30000;
+  pointer-events: none;
+  transform-origin: center;
+  background: radial-gradient(circle at 50% 50%, #ffffff 0%, rgba(255, 255, 255, 0.6) 45%, transparent 75%);
+  transform: scale(4);
+  opacity: 0;
 }
 
-@keyframes tvTurnOff {
-  0%   { transform: scaleY(1)     scaleX(1);    opacity: 1; filter: brightness(2.5); }
-  28%  { transform: scaleY(0.003) scaleX(1);    opacity: 1; filter: brightness(3); }
-  68%  { transform: scaleY(0.003) scaleX(0.07); opacity: 1; filter: brightness(2); }
-  88%  { transform: scaleY(0.003) scaleX(0.015);opacity: 0.7; }
-  100% { transform: scaleY(0.003) scaleX(0);    opacity: 0; }
+.intro-suck-overlay.is-active {
+  animation: introSuckIn 750ms cubic-bezier(0.65, 0, 1, 1) forwards;
+}
+
+@keyframes introSuckIn {
+  0%   { transform: scale(4);    opacity: 0.85; }
+  12%  { opacity: 1; }
+  100% { transform: scale(0.01); opacity: 1; filter: brightness(5); }
+}
+
+/* TV turn-off: white screen collapses to horizontal line, then to a dot */
+.intro-tvoff-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30001;
+  pointer-events: none;
+  transform-origin: center;
+  background: #ffffff;
+  opacity: 1;
+}
+
+.intro-tvoff-overlay.is-active {
+  animation: introTvOff 850ms cubic-bezier(0.3, 0, 0.8, 0.2) forwards;
+}
+
+@keyframes introTvOff {
+  0%   { transform: scaleY(1)     scaleX(1);     opacity: 1; filter: brightness(2.5); }
+  26%  { transform: scaleY(0.003) scaleX(1);     opacity: 1; filter: brightness(3); }
+  66%  { transform: scaleY(0.003) scaleX(0.06);  opacity: 1; filter: brightness(2); }
+  86%  { transform: scaleY(0.003) scaleX(0.012); opacity: 0.6; }
+  100% { transform: scaleY(0.003) scaleX(0);     opacity: 0; }
 }
 
 .intro-hint-overlay {

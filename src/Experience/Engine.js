@@ -215,7 +215,6 @@ class Engine {
     const introScreen = document.getElementById('intro-screen')
 
     if (!playIntro) {
-      // Returning visitor — skip intro, reveal gallery normally
       introScreen?.remove()
       this.experience.gallery?.startIntroAnimation()
       await nextFrame()
@@ -226,12 +225,10 @@ class Engine {
       return
     }
 
-    // ── First-visit intro ──────────────────────────────────────────────────────
-    // The intro-screen (dark overlay, z-index 20000) covers everything.
-    // Remove the loading screen underneath immediately since it's hidden behind it.
+    // ── First-visit intro ─────────────────────────────────────────────────────
     document.getElementById('loading-screen')?.remove()
 
-    // Helper: show a line of text, hold, then fade it out
+    // Show a text card, hold, then fade it out. Returns after element is removed.
     const showHint = (text, holdMs = 1400) => {
       const el = document.createElement('p')
       el.className = 'intro-hint-overlay'
@@ -242,12 +239,12 @@ class Engine {
         setTimeout(() => {
           el.classList.remove('is-visible')
           el.classList.add('is-out')
-          el.addEventListener('transitionend', () => { el.remove(); resolve() }, { once: true })
+          setTimeout(() => { el.remove(); resolve() }, 700)
         }, holdMs)
       })
     }
 
-    // ── Phase 1: cinematic text on dark screen ─────────────────────────────────
+    // ── Phase 1: cinematic text cards on the dark screen ──────────────────────
     await sleep(600)
     await showHint('Use the arrow keys to explore.', 1400)
     await sleep(200)
@@ -256,7 +253,6 @@ class Engine {
     await showHint('Lachie Thurlow presents', 1400)
     await sleep(300)
 
-    // Title card
     const titleEl = document.createElement('p')
     titleEl.className = 'intro-hint-overlay intro-hint-overlay--title'
     titleEl.textContent = "Lachie's Photos"
@@ -267,19 +263,23 @@ class Engine {
     titleEl.classList.add('is-out')
     await sleep(700)
     titleEl.remove()
-    await sleep(200)
+    await sleep(300)
 
-    // ── Phase 2: reveal gallery, trail sweeps forward ──────────────────────────
-    // Fade the dark overlay to near-transparent so the gallery + trail are visible
+    // ── Phase 2: trail swirls on dark background (no photo planes) ────────────
+    // Hide planes so only the trail + background gradient are visible
+    const planes = this.experience.gallery?.planes ?? []
+    planes.forEach((p) => { p.visible = false })
+
+    // Fade dark overlay to near-transparent, revealing the trail
     if (introScreen) {
       introScreen.style.transition = 'opacity 900ms cubic-bezier(0.4, 0, 1, 1)'
-      introScreen.style.opacity = '0.08'
+      introScreen.style.opacity = '0.04'
     }
 
-    // Drive the trail with a forward scroll sweep
-    const sweepAmount = 700 // ~1.4 photos forward — clear trail arc without direction reversal
+    // Sweep the camera forward so the trail traces its sinusoidal path
+    const sweepAmount = 1400 // ~2.8 photos — enough arc for a proper swirl
     const startScroll = this.scroll.scrollCurrent ?? 0
-    const sweepDuration = 2200 // ms
+    const sweepDuration = 3200
 
     let skipped = false
     const skipHandler = () => { skipped = true }
@@ -291,7 +291,6 @@ class Engine {
         if (skipped) { resolve(); return }
         const elapsed = performance.now() - sweepStart
         const t = Math.min(elapsed / sweepDuration, 1)
-        // Ease-in-out, forward only — no direction reversal so trail never resets
         const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
         this.scroll.scrollTarget = startScroll + eased * sweepAmount
         this.scroll.scrollCurrent = this.scroll.scrollTarget
@@ -301,33 +300,43 @@ class Engine {
     })
 
     window.removeEventListener('keydown', skipHandler)
+    introScreen?.remove()
 
-    // ── Phase 3: TV turn-off — trail "vanishes" into a bright collapsing line ──
-    // Flash the intro-screen back to white, then play the CSS TV-off animation
-    if (introScreen) {
-      introScreen.style.transition = 'none'
-      introScreen.style.opacity = '1'
-      introScreen.style.background = '#ffffff'
-      await nextFrame()
-      await nextFrame()
-      introScreen.classList.add('tv-off')
-    }
+    // ── Phase 3: white glow sucks inward to a singular point ─────────────────
+    const suckEl = document.createElement('div')
+    suckEl.className = 'intro-suck-overlay'
+    document.body.appendChild(suckEl)
+    await nextFrame()
+    await nextFrame()
+    suckEl.classList.add('is-active')
 
-    await sleep(680) // match tvTurnOff animation duration
+    // At ~650ms the suck is nearly complete — place the TV-off overlay underneath
+    // so there's zero gap between the two effects
+    await sleep(650)
+    const tvEl = document.createElement('div')
+    tvEl.className = 'intro-tvoff-overlay'
+    document.body.appendChild(tvEl) // immediately white, covers scene
+    await sleep(100)
+    suckEl.remove()
 
-    // ── Phase 4: snap scroll back to first photo, reveal gallery ──────────────
+    // ── Phase 4: TV turn-off — bright line collapses to a dot ────────────────
+    await nextFrame()
+    await nextFrame()
+    tvEl.classList.add('is-active')
+    await sleep(850) // match introTvOff duration
+    tvEl.remove()
+
+    // ── Phase 5: snap scroll back to first photo, epic reveal ────────────────
     this.scroll.scrollTarget = startScroll
     this.scroll.scrollCurrent = startScroll
+    planes.forEach((p) => { p.visible = true })
 
     Intro.markPlayed()
     this.experience.gallery?.startIntroAnimation()
     await nextFrame()
     await nextFrame()
     document.body.classList.add('is-ready')
-    setTimeout(() => {
-      introScreen?.remove()
-      document.body.classList.add('is-intro-done')
-    }, 1200)
+    setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
   }
 
   setLoadingStep(step, state) {
