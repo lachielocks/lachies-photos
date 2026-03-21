@@ -133,13 +133,17 @@ class Engine {
       window.addEventListener('keydown', this.onKeyDown)
       document.addEventListener('fullscreenchange', this.onFullscreenChange)
       this.scroll.bindEvents()
-      this.nav.init((index) => this.scroll.navigateToPlane(index))
+      this.nav.init(
+        (index) => this.scroll.navigateToPlane(index),
+        (index) => this.downloadPhoto(index)
+      )
       this.initArrows()
       this.initPresentToggle()
       this.cursor.init(this.camera)
       this.progressBarFill = document.querySelector('.progress-bar__fill')
       this.music.init()
       this.initMuteButton()
+      this.initDownloadButton()
       this.isInitialized = true
       this.start()
       await sleep(Math.max(0, 1600 - (performance.now() - renderStart)))
@@ -221,6 +225,35 @@ class Engine {
       blendData.blend >= 0.5 ? blendData.nextPlaneIndex : blendData.currentPlaneIndex
     this.arrowUpBtn.disabled = current >= total - 1
     this.arrowDownBtn.disabled = current <= 0
+  }
+
+  getCurrentPlaneIndex() {
+    const blendData = this.experience.gallery.getPlaneBlendData(this.camera.position.z)
+    if (!blendData) return 0
+    return blendData.blend >= 0.5 ? blendData.nextPlaneIndex : blendData.currentPlaneIndex
+  }
+
+  downloadPhoto(index) {
+    const planeConfig = this.experience.gallery.planeConfig[index]
+    if (!planeConfig?.textureSrc) return
+
+    const name = planeConfig.label?.word || `photo-${index + 1}`
+    const ext = planeConfig.textureSrc.split('.').pop().split('?')[0] || 'jpg'
+    const filename = `${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.${ext}`
+
+    const a = document.createElement('a')
+    a.href = planeConfig.textureSrc
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+
+  initDownloadButton() {
+    const btn = document.querySelector('.download-btn')
+    if (!btn) return
+    this.downloadBtn = btn
+    btn.addEventListener('click', () => this.downloadPhoto(this.getCurrentPlaneIndex()))
   }
 
   initMuteButton() {

@@ -7,10 +7,12 @@ class Nav {
     this.listElement = null
     this.toggleElement = null
     this.navigateTo = null
+    this.downloadPhoto = null
   }
 
-  init(navigateTo) {
+  init(navigateTo, downloadPhoto) {
     this.navigateTo = navigateTo
+    this.downloadPhoto = downloadPhoto
     this.navElement = document.querySelector('.gallery-nav')
     this.listElement = document.querySelector('.gallery-nav__list')
     this.toggleElement = document.querySelector('.frame__menu-toggle')
@@ -47,7 +49,16 @@ class Nav {
       title.className = 'gallery-nav__title'
       title.textContent = plane.label?.navTitle || plane.label?.word || `Photo ${index + 1}`
 
-      li.append(number, title)
+      const downloadBtn = document.createElement('button')
+      downloadBtn.className = 'gallery-nav__download'
+      downloadBtn.setAttribute('aria-label', `Download ${title.textContent}`)
+      downloadBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`
+      downloadBtn.addEventListener('click', (e) => {
+        e.stopPropagation()
+        this.downloadPhoto?.(index)
+      })
+
+      li.append(number, title, downloadBtn)
       li.addEventListener('click', () => {
         this.navigateTo?.(index)
         this.close()

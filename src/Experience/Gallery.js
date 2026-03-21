@@ -616,8 +616,8 @@ class Gallery {
       const parallaxOffsetY = this.pointerCurrent.y * this.parallaxAmountY * parallaxInfluence
       const gestureOffsetY = this.driftCurrent * this.gestureParallaxAmountY
 
-      plane.position.x = xPosition + parallaxOffsetX
-      plane.position.y = yPosition + parallaxOffsetY + gestureOffsetY
+      plane.position.x = THREE.MathUtils.lerp(plane.position.x, xPosition + parallaxOffsetX, 0.15)
+      plane.position.y = THREE.MathUtils.lerp(plane.position.y, yPosition + parallaxOffsetY + gestureOffsetY, 0.15)
       plane.position.z = zPosition
 
       const breathInfluence = this.breathEnabled ? this.breathIntensity * opacity : 0
