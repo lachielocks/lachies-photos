@@ -66,6 +66,11 @@ class Nav {
 
       this.listElement.append(li)
     })
+
+    const footer = document.createElement('p')
+    footer.className = 'gallery-nav__footer'
+    footer.innerHTML = `Created by <a href="https://lachiethurlow.com" target="_blank" rel="noopener noreferrer">Lachie Thurlow</a>. Check out <a href="https://heyacosta.com" target="_blank" rel="noopener noreferrer">Acosta AI</a> and <a href="https://transnology.co" target="_blank" rel="noopener noreferrer">Transnology</a>.`
+    this.navElement?.appendChild(footer)
   }
 
   open() {

@@ -5,6 +5,7 @@ import { Scroll } from '@/Experience/Scroll'
 import { Nav } from '@/Experience/Nav'
 import { Cursor } from '@/Experience/Cursor'
 import { Music } from '@/Experience/Music'
+import { Intro } from '@/Experience/Intro'
 
 class Engine {
   constructor(canvas, experience = world) {
@@ -146,7 +147,7 @@ class Engine {
     this.animate = this.update.bind(this)
   }
 
-  async init() {
+  async init({ playIntro = false } = {}) {
     if (this.isInitialized) return
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -203,18 +204,139 @@ class Engine {
       this.setLoadingStep('rendering', 'done')
       await sleep(900)
     } finally {
-      // Start the intro offset BEFORE the loading screen fades so there's
-      // no flash of the plane at its final position
+      await this.playIntroReveal(playIntro)
+    }
+  }
+
+  async playIntroReveal(playIntro) {
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+
+    const introScreen = document.getElementById('intro-screen')
+
+    if (!playIntro) {
+      introScreen?.remove()
       this.experience.gallery?.startIntroAnimation()
       await nextFrame()
       await nextFrame()
       document.body.classList.add('is-ready')
       this.hideLoadingScreen()
-      // Clear intro animation fill-modes after they complete so that
-      // CSS transitions on body.is-expanded can override opacity correctly.
-      // Longest intro animation: plane-label-overlay at 400ms delay + 600ms = 1000ms.
       setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
+      return
     }
+
+    // ── First-visit intro ─────────────────────────────────────────────────────
+    document.getElementById('loading-screen')?.remove()
+
+    // Show a text card, hold, then fade it out. Returns after element is removed.
+    const showHint = (text, holdMs = 1400) => {
+      const el = document.createElement('p')
+      el.className = 'intro-hint-overlay'
+      el.textContent = text
+      document.body.appendChild(el)
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')))
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          el.classList.remove('is-visible')
+          el.classList.add('is-out')
+          setTimeout(() => { el.remove(); resolve() }, 700)
+        }, holdMs)
+      })
+    }
+
+    // ── Phase 1: cinematic text cards on the dark screen ──────────────────────
+    await sleep(600)
+    await showHint('Use the arrow keys to explore.', 1400)
+    await sleep(200)
+    await showHint('Press space to expand.', 1400)
+    await sleep(200)
+    await showHint('Lachie Thurlow presents', 1400)
+    await sleep(300)
+
+    const titleEl = document.createElement('p')
+    titleEl.className = 'intro-hint-overlay intro-hint-overlay--title'
+    titleEl.textContent = "Lachie's Photos"
+    document.body.appendChild(titleEl)
+    requestAnimationFrame(() => requestAnimationFrame(() => titleEl.classList.add('is-visible')))
+    await sleep(1800)
+    titleEl.classList.remove('is-visible')
+    titleEl.classList.add('is-out')
+    await sleep(700)
+    titleEl.remove()
+    await sleep(300)
+
+    // ── Phase 2: trail swirls on dark background (no photo planes) ────────────
+    // Hide planes so only the trail + background gradient are visible
+    const planes = this.experience.gallery?.planes ?? []
+    planes.forEach((p) => { p.visible = false })
+
+    // Fade dark overlay to near-transparent — trail becomes visible
+    if (introScreen) {
+      introScreen.style.transition = 'opacity 900ms cubic-bezier(0.4, 0, 1, 1)'
+      introScreen.style.opacity = '0.04'
+    }
+
+    // Sweep all the way to the last photo, accelerating exponentially.
+    // easeInExpo: nearly still at the start, then RUSHES to the end.
+    const startScroll = this.scroll.scrollCurrent ?? 0
+    const maxScroll = this.scroll.scrollFromCameraZ(this.scroll.minCameraZ)
+    const sweepDuration = 4000 // ms — slow start, explosive finish
+
+    let skipped = false
+    const skipHandler = () => { skipped = true }
+    window.addEventListener('keydown', skipHandler, { once: true })
+
+    await new Promise((resolve) => {
+      const sweepStart = performance.now()
+      const tick = () => {
+        if (skipped) { resolve(); return }
+        const elapsed = performance.now() - sweepStart
+        const t = Math.min(elapsed / sweepDuration, 1)
+        // Exponential ease-in: creeps at first, then explodes to the end
+        const eased = t === 0 ? 0 : Math.pow(2, 10 * t - 10)
+        this.scroll.scrollTarget = startScroll + eased * (maxScroll - startScroll)
+        this.scroll.scrollCurrent = this.scroll.scrollTarget
+        if (t < 1) { requestAnimationFrame(tick) } else { resolve() }
+      }
+      requestAnimationFrame(tick)
+    })
+
+    window.removeEventListener('keydown', skipHandler)
+
+    // ── Phase 3: white flash — the trail vanishes into blinding light ─────────
+    if (introScreen) {
+      introScreen.style.transition = 'none'
+      introScreen.style.background = '#ffffff'
+      introScreen.style.opacity = '1'
+    }
+    await sleep(60) // one-frame flash hold
+
+    // ── Phase 4: TV turn-off — line collapses to a dot, everything goes black ──
+    const tvEl = document.createElement('div')
+    tvEl.className = 'intro-tvoff-overlay'
+    document.body.appendChild(tvEl)
+    if (introScreen) introScreen.style.opacity = '0' // intro-screen no longer needed
+    await nextFrame()
+    await nextFrame()
+    tvEl.classList.add('is-active')
+    await sleep(900) // match introTvOff duration
+
+    // After TV-off completes, hold on black before the reveal
+    tvEl.remove()
+    await sleep(300)
+
+    // ── Phase 5: snap scroll to first photo, epic reveal ─────────────────────
+    this.scroll.scrollTarget = startScroll
+    this.scroll.scrollCurrent = startScroll
+    planes.forEach((p) => { p.visible = true })
+
+    Intro.markPlayed()
+    this.experience.gallery?.startIntroAnimation()
+    await nextFrame()
+    await nextFrame()
+    document.body.classList.add('is-ready')
+    introScreen?.remove()
+    setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
   }
 
   setLoadingStep(step, state) {
