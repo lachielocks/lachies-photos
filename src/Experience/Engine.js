@@ -409,6 +409,9 @@ class Engine {
     })
     document.body.appendChild(el)
     this.shortcutsMenuEl = el
+
+    const btn = document.querySelector('.shortcuts-btn')
+    btn?.addEventListener('click', () => this.toggleShortcutsMenu())
   }
 
   toggleShortcutsMenu() {
@@ -419,12 +422,14 @@ class Engine {
     this.shortcutsMenuOpen = true
     this.shortcutsMenuEl.classList.add('is-open')
     this.shortcutsMenuEl.setAttribute('aria-hidden', 'false')
+    document.querySelector('.shortcuts-btn')?.classList.add('is-active')
   }
 
   closeShortcutsMenu() {
     this.shortcutsMenuOpen = false
     this.shortcutsMenuEl.classList.remove('is-open')
     this.shortcutsMenuEl.setAttribute('aria-hidden', 'true')
+    document.querySelector('.shortcuts-btn')?.classList.remove('is-active')
   }
 
   initMuteButton() {
