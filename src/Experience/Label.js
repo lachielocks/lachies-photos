@@ -227,7 +227,7 @@ class Label {
     }
 
     this.applyPlaneContent(targetPlaneIndex)
-    this.overlayElement.style.opacity = '1'
+    this.overlayElement.style.opacity = '' // Let CSS class rules control opacity
   }
 
   render() {}
