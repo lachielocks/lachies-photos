@@ -227,17 +227,16 @@ class Engine {
     }
 
     // ── First-visit intro ──────────────────────────────────────────────────────
-    // The intro-screen (dark overlay, z-index 20000) is already covering everything.
+    // The intro-screen (dark overlay, z-index 20000) covers everything.
     // Remove the loading screen underneath immediately since it's hidden behind it.
     document.getElementById('loading-screen')?.remove()
 
-    // Helper: show a text hint, hold, then fade it out
-    const showHint = (text, holdMs = 1200) => {
+    // Helper: show a line of text, hold, then fade it out
+    const showHint = (text, holdMs = 1400) => {
       const el = document.createElement('p')
       el.className = 'intro-hint-overlay'
       el.textContent = text
       document.body.appendChild(el)
-      // Trigger enter transition
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')))
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -257,7 +256,7 @@ class Engine {
     await showHint('Lachie Thurlow presents', 1400)
     await sleep(300)
 
-    // Show title in larger style briefly
+    // Title card
     const titleEl = document.createElement('p')
     titleEl.className = 'intro-hint-overlay intro-hint-overlay--title'
     titleEl.textContent = "Lachie's Photos"
@@ -270,16 +269,17 @@ class Engine {
     titleEl.remove()
     await sleep(200)
 
-    // ── Phase 2: fade out dark overlay, reveal gallery with trail sweep ────────
+    // ── Phase 2: reveal gallery, trail sweeps forward ──────────────────────────
+    // Fade the dark overlay to near-transparent so the gallery + trail are visible
     if (introScreen) {
-      introScreen.classList.add('is-exiting')
-      // 900ms CSS transition — gallery becomes visible, trail will sweep
+      introScreen.style.transition = 'opacity 900ms cubic-bezier(0.4, 0, 1, 1)'
+      introScreen.style.opacity = '0.08'
     }
 
-    // Animate scroll forward-only sweep (no reversal) while screen fades in
-    const sweepAmount = 700 // ~1.4 photos forward
+    // Drive the trail with a forward scroll sweep
+    const sweepAmount = 700 // ~1.4 photos forward — clear trail arc without direction reversal
     const startScroll = this.scroll.scrollCurrent ?? 0
-    const sweepDuration = 2800 // ms — longer than the fade so trail is visible after reveal
+    const sweepDuration = 2200 // ms
 
     let skipped = false
     const skipHandler = () => { skipped = true }
@@ -291,44 +291,33 @@ class Engine {
         if (skipped) { resolve(); return }
         const elapsed = performance.now() - sweepStart
         const t = Math.min(elapsed / sweepDuration, 1)
-        // Ease-in-out curve (forward only — no direction reversal, no trail reset)
+        // Ease-in-out, forward only — no direction reversal so trail never resets
         const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
-        const scrollValue = startScroll + eased * sweepAmount
-        this.scroll.scrollTarget = scrollValue
-        this.scroll.scrollCurrent = scrollValue
-        if (t < 1) {
-          requestAnimationFrame(tick)
-        } else {
-          resolve()
-        }
+        this.scroll.scrollTarget = startScroll + eased * sweepAmount
+        this.scroll.scrollCurrent = this.scroll.scrollTarget
+        if (t < 1) { requestAnimationFrame(tick) } else { resolve() }
       }
       requestAnimationFrame(tick)
     })
 
     window.removeEventListener('keydown', skipHandler)
 
-    // Wait for intro screen to fully fade before snapping back
-    await sleep(400)
-
-    // Fade intro-screen back briefly to cover the scroll snap
+    // ── Phase 3: TV turn-off — trail "vanishes" into a bright collapsing line ──
+    // Flash the intro-screen back to white, then play the CSS TV-off animation
     if (introScreen) {
-      introScreen.style.transition = 'opacity 300ms ease'
+      introScreen.style.transition = 'none'
       introScreen.style.opacity = '1'
-      await sleep(320)
+      introScreen.style.background = '#ffffff'
+      await nextFrame()
+      await nextFrame()
+      introScreen.classList.add('tv-off')
     }
 
-    // Snap scroll back to start (first photo)
+    await sleep(680) // match tvTurnOff animation duration
+
+    // ── Phase 4: snap scroll back to first photo, reveal gallery ──────────────
     this.scroll.scrollTarget = startScroll
     this.scroll.scrollCurrent = startScroll
-
-    // Brief pause at start, then reveal
-    await sleep(100)
-
-    // Fade intro-screen out for the final reveal
-    if (introScreen) {
-      introScreen.style.transition = 'opacity 700ms cubic-bezier(0.4, 0, 1, 1)'
-      introScreen.style.opacity = '0'
-    }
 
     Intro.markPlayed()
     this.experience.gallery?.startIntroAnimation()
@@ -527,6 +516,11 @@ class Engine {
         <div><dt>P</dt><dd>Present</dd></div>
         <div><dt>?</dt><dd>Shortcuts</dd></div>
       </dl>
+      <p class="shortcuts-menu__footer">
+        Created by <a href="https://lachiethurlow.com" target="_blank" rel="noopener noreferrer">Lachie Thurlow</a>.
+        Check out <a href="https://heyacosta.com" target="_blank" rel="noopener noreferrer">Acosta AI</a> and
+        <a href="https://transnology.co" target="_blank" rel="noopener noreferrer">Transnology</a>.
+      </p>
     `
     el.addEventListener('click', (e) => {
       if (e.target === el) this.closeShortcutsMenu()
