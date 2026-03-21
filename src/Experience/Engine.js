@@ -155,6 +155,10 @@ class Engine {
       await nextFrame()
       document.body.classList.add('is-ready')
       this.hideLoadingScreen()
+      // Clear intro animation fill-modes after they complete so that
+      // CSS transitions on body.is-expanded can override opacity correctly.
+      // Longest intro animation: plane-label-overlay at 400ms delay + 600ms = 1000ms.
+      setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
     }
   }
 
