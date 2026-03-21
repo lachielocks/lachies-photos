@@ -121,6 +121,9 @@ class Scroll {
 
   clearExpand() {
     this.expandActive = false
+    // Sync scroll position to camera so there's no snap on collapse
+    this.scrollTarget = this.scrollFromCameraZ(this.camera.position.z)
+    this.scrollCurrent = this.scrollTarget
   }
 
   addScrollInput(deltaY) {

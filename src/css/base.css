@@ -200,6 +200,30 @@ body.is-ready .plane-label-overlay {
   }
 }
 
+/*
+ * After intro animations complete, clear their fill-mode values.
+ * CSS animations sit higher in the cascade than regular author rules,
+ * so body.is-expanded { opacity: 0 } can't override the animation fill
+ * that holds opacity: 1 on these elements. Clearing the animation and
+ * pinning the values explicitly lets the transitions work correctly.
+ */
+body.is-intro-done .frame {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+body.is-intro-done .gallery-arrows {
+  animation: none;
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+body.is-intro-done .plane-label-overlay {
+  animation: none;
+  opacity: 1;
+}
+
 a {
   text-decoration: none;
   color: var(--color-link);
