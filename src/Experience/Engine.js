@@ -77,6 +77,10 @@ class Engine {
         this.togglePresentMode()
         return
       }
+      if (event.key.toLowerCase() === 'm') {
+        this.music.toggle()
+        return
+      }
       if (event.key === 'Escape') {
         if (this.cursor?.isExpanded) {
           this.cursor.collapse()
@@ -86,6 +90,17 @@ class Engine {
           this.togglePresentMode()
           return
         }
+      }
+      if (event.key === ' ' || event.key === 'Enter') {
+        if (!this.nav?.isOpen) {
+          event.preventDefault()
+          if (this.cursor?.isExpanded) {
+            this.cursor.collapse()
+          } else {
+            this.cursor.expand(this.getCurrentPlaneIndex())
+          }
+        }
+        return
       }
       if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
         event.preventDefault()
@@ -144,6 +159,9 @@ class Engine {
       this.music.init()
       this.initMuteButton()
       this.initDownloadButton()
+      this.initShareButton()
+      this.initPhotoCounter()
+      this.applyDeepLink()
       this.isInitialized = true
       this.start()
       await sleep(Math.max(0, 1600 - (performance.now() - renderStart)))
@@ -254,6 +272,84 @@ class Engine {
     if (!btn) return
     this.downloadBtn = btn
     btn.addEventListener('click', () => this.downloadPhoto(this.getCurrentPlaneIndex()))
+  }
+
+  // ── Photo counter ────────────────────────────────────────────────
+  initPhotoCounter() {
+    this.photoCounterEl = document.querySelector('.photo-counter')
+    this.updatePhotoCounter()
+  }
+
+  updatePhotoCounter() {
+    if (!this.photoCounterEl) return
+    const index = this.getCurrentPlaneIndex()
+    const total = this.experience.gallery.planes.length
+    this.photoCounterEl.textContent =
+      `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`
+  }
+
+  // ── Ambient color ────────────────────────────────────────────────
+  updateAmbientColor() {
+    const c = this.experience.background.backgroundColor
+    if (!c) return
+    document.body.style.backgroundColor =
+      `rgb(${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(c.b * 255)})`
+  }
+
+  // ── Share button ─────────────────────────────────────────────────
+  initShareButton() {
+    const btn = document.querySelector('.share-btn')
+    if (!btn) return
+    this.shareBtn = btn
+    btn.addEventListener('click', () => this.shareCurrentPhoto())
+  }
+
+  async shareCurrentPhoto() {
+    const index = this.getCurrentPlaneIndex()
+    const planeConfig = this.experience.gallery.planeConfig[index]
+    const title = planeConfig?.label?.word || `Photo ${index + 1}`
+    const url = new URL(window.location.href)
+    url.searchParams.set('photo', String(index + 1))
+    const shareUrl = url.toString()
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${title} — Lachie's Photos`, url: shareUrl })
+        return
+      } catch (e) {
+        if (e.name === 'AbortError') return
+      }
+    }
+    this.copyShareLink(shareUrl)
+  }
+
+  copyShareLink(url) {
+    navigator.clipboard?.writeText(url).then(() => this.showCopiedToast()).catch(() => {})
+  }
+
+  showCopiedToast() {
+    const existing = document.querySelector('.copied-toast')
+    existing?.remove()
+    const toast = document.createElement('div')
+    toast.className = 'copied-toast'
+    toast.textContent = 'Link copied'
+    document.body.appendChild(toast)
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('is-visible')))
+    clearTimeout(this._copiedTimer)
+    this._copiedTimer = setTimeout(() => {
+      toast.classList.remove('is-visible')
+      toast.addEventListener('transitionend', () => toast.remove(), { once: true })
+    }, 2500)
+  }
+
+  applyDeepLink() {
+    const param = new URLSearchParams(window.location.search).get('photo')
+    if (!param) return
+    const index = parseInt(param, 10) - 1
+    const total = this.experience.gallery.planes.length
+    if (index >= 0 && index < total) {
+      this.scroll.navigateToPlane(index)
+    }
   }
 
   initMuteButton() {
@@ -372,6 +468,8 @@ class Engine {
     this.music.update()
     this.updateArrows()
     this.updateProgressBar()
+    this.updatePhotoCounter()
+    this.updateAmbientColor()
 
     this.renderer.clear(true, true, true)
     this.experience.background.render(this.renderer)

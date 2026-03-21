@@ -12,7 +12,7 @@
 }
 
 body {
-  transition: background-color 600ms ease;
+  transition: none;
 }
 
 body.is-presenting .webgl {
@@ -528,6 +528,18 @@ body.is-expanded .download-btn {
   pointer-events: none;
 }
 
+body.is-expanded .share-btn {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+body.is-expanded .photo-counter {
+  opacity: 0;
+  transform: translateX(-50%) translateY(6px);
+  pointer-events: none;
+}
+
 body.is-expanded .now-playing-toast {
   opacity: 0;
   pointer-events: none;
@@ -564,6 +576,92 @@ body.is-expanded .webgl {
   background: rgba(255, 255, 255, 0.5);
   transform-origin: left center;
   transform: scaleX(0);
+}
+
+/* =====================================================
+   PHOTO COUNTER
+   ===================================================== */
+
+.photo-counter {
+  position: fixed;
+  bottom: max(1.75rem, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  font-family: var(--ui-font);
+  font-size: 9px;
+  letter-spacing: var(--ui-tracking);
+  color: rgba(255, 255, 255, 0.32);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 320ms ease, transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =====================================================
+   SHARE BUTTON
+   ===================================================== */
+
+.share-btn {
+  position: fixed;
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
+  right: calc(max(1.5rem, env(safe-area-inset-right)) + 2 * (2.5rem + 0.5rem));
+  z-index: 200;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.45);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease,
+    opacity 320ms ease,
+    transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.75);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* =====================================================
+   COPIED TOAST
+   ===================================================== */
+
+.copied-toast {
+  position: fixed;
+  bottom: calc(max(1.5rem, env(safe-area-inset-bottom)) + 3.5rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  z-index: 500;
+  padding: 0.5rem 0.875rem;
+  background: rgba(8, 8, 12, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  font-family: var(--ui-font);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: var(--ui-tracking);
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 280ms ease,
+    transform 280ms cubic-bezier(0.34, 1.2, 0.64, 1);
+
+  &.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* =====================================================
