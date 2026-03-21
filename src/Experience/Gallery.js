@@ -192,6 +192,7 @@ class Gallery {
     return {
       word: label.word || fallback.word,
       description: label.description || '',
+      camera: label.camera || 'Canon EOS R50',
       iso: label.iso || '',
       av: label.av || '',
       tv: label.tv || '',

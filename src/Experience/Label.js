@@ -7,6 +7,7 @@ class Label {
     this.wordElement = null
     this.descriptionElement = null
     this.chipElement = null
+    this.cameraValueElement = null
     this.isoValueElement = null
     this.avValueElement = null
     this.tvValueElement = null
@@ -26,6 +27,10 @@ class Label {
       </div>
       <article class="plane-label-card plane-label-overlay__right">
         <dl class="plane-label-card__specs">
+          <div class="plane-label-card__row">
+            <dt>CAMERA</dt>
+            <dd class="plane-label-card__value plane-label-card__value--camera"></dd>
+          </div>
           <div class="plane-label-card__row">
             <dt>ISO</dt>
             <dd class="plane-label-card__value plane-label-card__value--iso"></dd>
@@ -52,6 +57,7 @@ class Label {
       wordElement: element.querySelector('.plane-label-card__word'),
       descriptionElement: element.querySelector('.plane-label-card__description'),
       chipElement: element.querySelector('.plane-label-overlay__chip'),
+      cameraValueElement: element.querySelector('.plane-label-card__value--camera'),
       isoValueElement: element.querySelector('.plane-label-card__value--iso'),
       avValueElement: element.querySelector('.plane-label-card__value--av'),
       tvValueElement: element.querySelector('.plane-label-card__value--tv'),
@@ -68,6 +74,7 @@ class Label {
       wordElement,
       descriptionElement,
       chipElement,
+      cameraValueElement,
       isoValueElement,
       avValueElement,
       tvValueElement,
@@ -79,6 +86,7 @@ class Label {
     this.wordElement = wordElement
     this.descriptionElement = descriptionElement
     this.chipElement = chipElement
+    this.cameraValueElement = cameraValueElement
     this.isoValueElement = isoValueElement
     this.avValueElement = avValueElement
     this.tvValueElement = tvValueElement
@@ -198,6 +206,9 @@ class Label {
     // Chip spring-pop
     this.animateChip(chipHex)
 
+    // Camera: slide in (same for all photos, but animate on change for consistency)
+    this.slideIn(this.cameraValueElement, labelData.camera || '—', isFirstLoad ? 0 : 0)
+
     // Scramble: ISO, AV, TV, FOCAL with slight stagger
     if (isFirstLoad) {
       this.isoValueElement.textContent = labelData.iso || '—'
@@ -239,6 +250,7 @@ class Label {
     this.wordElement = null
     this.descriptionElement = null
     this.chipElement = null
+    this.cameraValueElement = null
     this.isoValueElement = null
     this.avValueElement = null
     this.tvValueElement = null
