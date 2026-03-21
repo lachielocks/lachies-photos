@@ -82,6 +82,10 @@ class Engine {
         return
       }
       if (event.key === 'Escape') {
+        if (this.shortcutsMenuOpen) {
+          this.closeShortcutsMenu()
+          return
+        }
         if (this.cursor?.isExpanded) {
           this.cursor.collapse()
           return
@@ -90,6 +94,16 @@ class Engine {
           this.togglePresentMode()
           return
         }
+        if (this.nav?.isOpen) {
+          this.nav.close()
+          return
+        }
+        this.nav.open()
+        return
+      }
+      if (event.key === '?') {
+        this.toggleShortcutsMenu()
+        return
       }
       if (event.key === ' ' || event.key === 'Enter') {
         if (!this.nav?.isOpen) {
@@ -179,6 +193,7 @@ class Engine {
       this.initDownloadButton()
       this.initShareButton()
       this.initPhotoCounter()
+      this.initShortcutsMenu()
       this.applyDeepLink()
       this.isInitialized = true
       this.start()
@@ -368,6 +383,48 @@ class Engine {
     if (index >= 0 && index < total) {
       this.scroll.navigateToPlane(index)
     }
+  }
+
+  // ── Shortcuts menu ───────────────────────────────────────────────
+  initShortcutsMenu() {
+    this.shortcutsMenuOpen = false
+    const el = document.createElement('div')
+    el.className = 'shortcuts-menu'
+    el.setAttribute('aria-hidden', 'true')
+    el.innerHTML = `
+      <p class="shortcuts-menu__title">Keyboard Shortcuts</p>
+      <dl class="shortcuts-menu__list">
+        <div><dt>↑ ↓</dt><dd>Navigate</dd></div>
+        <div><dt>Home / End</dt><dd>First / Last</dd></div>
+        <div><dt>R</dt><dd>Random</dd></div>
+        <div><dt>Space</dt><dd>Expand photo</dd></div>
+        <div><dt>Esc</dt><dd>Back / Menu</dd></div>
+        <div><dt>M</dt><dd>Mute</dd></div>
+        <div><dt>P</dt><dd>Present</dd></div>
+        <div><dt>?</dt><dd>Shortcuts</dd></div>
+      </dl>
+    `
+    el.addEventListener('click', (e) => {
+      if (e.target === el) this.closeShortcutsMenu()
+    })
+    document.body.appendChild(el)
+    this.shortcutsMenuEl = el
+  }
+
+  toggleShortcutsMenu() {
+    this.shortcutsMenuOpen ? this.closeShortcutsMenu() : this.openShortcutsMenu()
+  }
+
+  openShortcutsMenu() {
+    this.shortcutsMenuOpen = true
+    this.shortcutsMenuEl.classList.add('is-open')
+    this.shortcutsMenuEl.setAttribute('aria-hidden', 'false')
+  }
+
+  closeShortcutsMenu() {
+    this.shortcutsMenuOpen = false
+    this.shortcutsMenuEl.classList.remove('is-open')
+    this.shortcutsMenuEl.setAttribute('aria-hidden', 'true')
   }
 
   initMuteButton() {

@@ -125,8 +125,7 @@ class Label {
   }
 
   // Scramble animation: random chars cycle, then resolve left-to-right
-  scrambleValue(element, targetText, duration = 580) {
-    const chars = '0123456789/fms.–'
+  scrambleValue(element, targetText, duration = 580, chars = '0123456789/fms.–') {
     const len = Math.max(targetText.length, 1)
     const start = performance.now()
     const resolveStart = duration * 0.3 // begin resolving characters at 30%
@@ -206,8 +205,12 @@ class Label {
     // Chip spring-pop
     this.animateChip(chipHex)
 
-    // Camera: slide in (same for all photos, but animate on change for consistency)
-    this.slideIn(this.cameraValueElement, labelData.camera || '—', isFirstLoad ? 0 : 0)
+    // Camera: scramble with alphanumeric charset
+    if (isFirstLoad) {
+      this.cameraValueElement.textContent = labelData.camera || '—'
+    } else {
+      this.scrambleValue(this.cameraValueElement, labelData.camera || '—', 520, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ')
+    }
 
     // Scramble: ISO, AV, TV, FOCAL with slight stagger
     if (isFirstLoad) {

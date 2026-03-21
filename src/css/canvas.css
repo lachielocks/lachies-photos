@@ -579,6 +579,75 @@ body.is-expanded .webgl {
 }
 
 /* =====================================================
+   SHORTCUTS MENU
+   ===================================================== */
+
+.shortcuts-menu {
+  position: fixed;
+  bottom: calc(max(1.5rem, env(safe-area-inset-bottom)) + 3.75rem);
+  left: max(1.5rem, env(safe-area-inset-left));
+  z-index: 400;
+  padding: 1rem 1.25rem 1.125rem;
+  background: rgba(8, 8, 12, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 240ms ease,
+    transform 240ms cubic-bezier(0.34, 1.1, 0.64, 1);
+
+  &.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+.shortcuts-menu__title {
+  margin: 0 0 0.75rem;
+  font-size: 9px;
+  font-family: var(--ui-font);
+  text-transform: uppercase;
+  letter-spacing: var(--ui-tracking);
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.shortcuts-menu__list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  > div {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  dt {
+    font-size: 9px;
+    font-family: var(--ui-font);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 9px;
+    font-family: var(--ui-font);
+    text-transform: uppercase;
+    letter-spacing: var(--ui-tracking);
+    color: rgba(255, 255, 255, 0.32);
+    white-space: nowrap;
+  }
+}
+
+/* =====================================================
    PHOTO COUNTER
    ===================================================== */
 
