@@ -102,6 +102,24 @@ class Engine {
         }
         return
       }
+      if (event.key === 'Home') {
+        event.preventDefault()
+        this.scroll.navigateToPlane(0)
+        return
+      }
+      if (event.key === 'End') {
+        event.preventDefault()
+        this.scroll.navigateToPlane(this.experience.gallery.planes.length - 1)
+        return
+      }
+      if (event.key.toLowerCase() === 'r') {
+        const total = this.experience.gallery.planes.length
+        const current = this.getCurrentPlaneIndex()
+        let next = Math.floor(Math.random() * (total - 1))
+        if (next >= current) next++
+        this.scroll.navigateToPlane(next)
+        return
+      }
       if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
         event.preventDefault()
         this.scroll.navigateRelative(1)
