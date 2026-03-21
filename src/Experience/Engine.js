@@ -146,7 +146,7 @@ class Engine {
     this.animate = this.update.bind(this)
   }
 
-  async init() {
+  async init(introPromise = Promise.resolve()) {
     if (this.isInitialized) return
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -203,8 +203,12 @@ class Engine {
       this.setLoadingStep('rendering', 'done')
       await sleep(900)
     } finally {
-      // Start the intro offset BEFORE the loading screen fades so there's
-      // no flash of the plane at its final position
+      // Wait for the intro screen to signal its exit before revealing the gallery.
+      // When no intro is playing, introPromise is already resolved (no-op).
+      await introPromise
+
+      // Start the spring-in BEFORE the loading screen / intro fade completes
+      // so there's no flash of the plane at its final resting position.
       this.experience.gallery?.startIntroAnimation()
       await nextFrame()
       await nextFrame()
