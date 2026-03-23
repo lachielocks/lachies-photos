@@ -12,6 +12,9 @@ import PHOTO10 from '@/assets/IMG_0473.JPG'
 import PHOTO11 from '@/assets/IMG_0474.JPG'
 import PHOTO12 from '@/assets/IMG_0147.jpeg'
 import PHOTO13 from '@/assets/IMG_0198.jpeg'
+import LUNA1 from '@/assets/Luna - 1.png'
+import LUNA2 from '@/assets/Luna - 2.png'
+import LUNA3 from '@/assets/Luna - 3.png'
 
 const galleryPlaneData = [
   {
@@ -228,6 +231,63 @@ const galleryPlaneData = [
       av: 'f/7.1',
       tv: '1/4,000s',
       focal: '158mm',
+      color: '#f4f4f4',
+    },
+  },
+  {
+    fallbackColor: '#c8a0d4',
+    accentColor: '#c8a0d4',
+    textureSrc: LUNA1,
+    position: { x: -0.8, y: 0 },
+    backgroundColor: '#1a1020',
+    blob1Color: '#b080c0',
+    blob2Color: '#6a4a80',
+    label: {
+      word: 'Luna',
+      navTitle: 'Luna - 1',
+      description: 'Coming soon.',
+      iso: '—',
+      av: '—',
+      tv: '—',
+      focal: '—',
+      color: '#f4f4f4',
+    },
+  },
+  {
+    fallbackColor: '#d4a870',
+    accentColor: '#d4a870',
+    textureSrc: LUNA2,
+    position: { x: 0.9, y: 0 },
+    backgroundColor: '#1a1208',
+    blob1Color: '#c89050',
+    blob2Color: '#805030',
+    label: {
+      word: 'Luna',
+      navTitle: 'Luna - 2',
+      description: 'Coming soon.',
+      iso: '—',
+      av: '—',
+      tv: '—',
+      focal: '—',
+      color: '#f4f4f4',
+    },
+  },
+  {
+    fallbackColor: '#8ab4c8',
+    accentColor: '#8ab4c8',
+    textureSrc: LUNA3,
+    position: { x: -0.7, y: 0 },
+    backgroundColor: '#0a1418',
+    blob1Color: '#6a9ab0',
+    blob2Color: '#304858',
+    label: {
+      word: 'Luna',
+      navTitle: 'Luna - 3',
+      description: 'Coming soon.',
+      iso: '—',
+      av: '—',
+      tv: '—',
+      focal: '—',
       color: '#f4f4f4',
     },
   },
