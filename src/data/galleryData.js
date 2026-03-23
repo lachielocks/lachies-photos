@@ -10,6 +10,8 @@ import PHOTO08 from '@/assets/Frozen Water.JPG'
 import PHOTO09 from '@/assets/IMG_0442.JPG'
 import PHOTO10 from '@/assets/IMG_0473.JPG'
 import PHOTO11 from '@/assets/IMG_0474.JPG'
+import PHOTO12 from '@/assets/IMG_0147.jpeg'
+import PHOTO13 from '@/assets/IMG_0198.jpeg'
 
 const galleryPlaneData = [
   {
@@ -226,6 +228,42 @@ const galleryPlaneData = [
       av: 'f/7.1',
       tv: '1/4,000s',
       focal: '158mm',
+      color: '#f4f4f4',
+    },
+  },
+  {
+    fallbackColor: '#305030',
+    accentColor: '#305030',
+    textureSrc: PHOTO12,
+    position: { x: -0.8, y: 0 },
+    backgroundColor: '#0d1210',
+    blob1Color: '#305030',
+    blob2Color: '#103030',
+    label: {
+      word: 'Coming Soon',
+      description: 'This photo is coming soon.',
+      iso: '—',
+      av: '—',
+      tv: '—',
+      focal: '—',
+      color: '#f4f4f4',
+    },
+  },
+  {
+    fallbackColor: '#b09070',
+    accentColor: '#b09070',
+    textureSrc: PHOTO13,
+    position: { x: 0.9, y: 0 },
+    backgroundColor: '#1a1210',
+    blob1Color: '#b09090',
+    blob2Color: '#705050',
+    label: {
+      word: 'Coming Soon',
+      description: 'This photo is coming soon.',
+      iso: '—',
+      av: '—',
+      tv: '—',
+      focal: '—',
       color: '#f4f4f4',
     },
   },
