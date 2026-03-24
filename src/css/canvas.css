@@ -149,8 +149,9 @@ body.is-presenting .gallery-arrows {
   backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 5rem clamp(2rem, 8vw, 10rem);
+  overflow-y: auto;
   pointer-events: none;
   opacity: 0;
   transition: opacity 400ms ease;
@@ -185,6 +186,9 @@ body.is-presenting .gallery-arrows {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: clamp(1.5rem, 5vw, 5rem);
 }
 
 .gallery-nav__item {
@@ -201,7 +205,7 @@ body.is-presenting .gallery-arrows {
     transform 350ms ease calc(var(--i) * 45ms),
     border-color 200ms ease;
 
-  &:first-child {
+  &:nth-child(-n+2) {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
