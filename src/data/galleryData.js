@@ -306,7 +306,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS1,
     position: { x: -0.8, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -325,7 +325,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS2,
     position: { x: 0.9, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -344,7 +344,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS3,
     position: { x: -0.7, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -363,7 +363,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS4,
     position: { x: 0.8, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -382,7 +382,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS5,
     position: { x: -0.9, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -401,7 +401,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS6,
     position: { x: 0.7, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -420,7 +420,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS7,
     position: { x: -0.8, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -439,7 +439,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS8,
     position: { x: 0.9, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -458,7 +458,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS9,
     position: { x: -0.7, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
@@ -477,7 +477,7 @@ const galleryPlaneData = [
     accentColor: '#ffffff',
     textureSrc: RELICS10,
     position: { x: 0.8, y: 0 },
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
     blob1Color: '#ffffff',
     blob2Color: '#ffffff',
     label: {
