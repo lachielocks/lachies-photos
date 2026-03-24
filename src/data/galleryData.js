@@ -317,7 +317,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -336,7 +336,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -355,7 +355,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -374,7 +374,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -393,7 +393,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -412,7 +412,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -431,7 +431,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -450,7 +450,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -469,7 +469,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
@@ -488,7 +488,7 @@ const galleryPlaneData = [
       av: '—',
       tv: '—',
       focal: '—',
-      color: '#000000',
+      color: '#f4f4f4',
     },
   },
   {
