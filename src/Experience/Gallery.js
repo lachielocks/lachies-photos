@@ -66,7 +66,7 @@ class Gallery {
     this.placeholderTexture = new THREE.DataTexture(placeholderData, 1, 1, THREE.RGBAFormat)
     this.placeholderTexture.needsUpdate = true
     this.planeFadeSampleOffset = 1
-    this.planeFadeSmoothing = 0.14
+    this.planeFadeSmoothing = 0.09
 
     // When >= 0, that plane is locked at full opacity (click-to-expand)
     this.expandedPlaneIndex = -1

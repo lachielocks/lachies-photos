@@ -11,7 +11,7 @@ class Scroll {
     // Scroll state
     this.scrollTarget = 0
     this.scrollCurrent = 0
-    this.scrollSmoothing = 0.08
+    this.scrollSmoothing = 0.06
     this.scrollToWorldFactor = 0.01
     this.wheelScrollSpeed = 1
     this.touchScrollSpeed = 1.8
