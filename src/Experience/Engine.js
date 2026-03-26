@@ -499,7 +499,8 @@ class Engine {
 
   updateTheEnd() {
     if (!this.theEndOverlay || !this.scroll.isInitialized) return
-    const atEnd = this.camera.position.z <= this.scroll.minCameraZ + 0.15
+    const lastPhotoZ = this.scroll.minCameraZ + this.scroll.theEndBuffer
+    const atEnd = this.camera.position.z < lastPhotoZ - 1
     if (atEnd !== this._theEndVisible) {
       this._theEndVisible = atEnd
       this.theEndOverlay.classList.toggle('is-visible', atEnd)
