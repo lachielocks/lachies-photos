@@ -196,6 +196,7 @@ class Engine {
       this.initShareButton()
       this.initPhotoCounter()
       this.initShortcutsMenu()
+      this.initTheEnd()
       this.applyDeepLink()
       this.isInitialized = true
       this.start()
@@ -230,6 +231,11 @@ class Engine {
     const nextFrame = () => new Promise((r) => requestAnimationFrame(r))
     const introScreen = document.getElementById('intro-screen')
 
+    // ── Wait for start interaction (satisfies browser autoplay policy) ────────
+    await this.waitForStart()
+    this.music.loadTrack(2, false)
+    this.music.unmute()
+
     // ── Non-first-visit fast path ─────────────────────────────────────────────
     if (!playIntro) {
       introScreen?.remove()
@@ -239,8 +245,6 @@ class Engine {
       document.body.classList.add('is-ready')
       this.hideLoadingScreen()
       setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
-      this.music.loadTrack(2, false)
-      this.music.unmute()
       return
     }
 
@@ -296,7 +300,7 @@ class Engine {
       ])
     }
 
-    // Stacking Q&A block — question first, then answers appear below it
+    // Stacking Q&A block — question first, then answers stack below, block drifts up
     const showCinematicBlock = async (question, answers) => {
       if (skipped) return
       const block = document.createElement('div')
@@ -307,11 +311,20 @@ class Engine {
       block.appendChild(qEl)
       document.body.appendChild(block)
       introElements.push(block)
+
+      // Nudge block upward as answers are added so it stays centred
+      let answerCount = 0
+      const recentre = () => {
+        // Each answer is ~1.4rem gap + ~1.2rem line height ≈ 2.6rem per answer
+        const offsetRem = answerCount * 1.3
+        block.style.transform = `translate(-50%, calc(-50% - ${offsetRem}rem))`
+      }
+
       requestAnimationFrame(() => requestAnimationFrame(() => {
         block.classList.add('is-visible')
         qEl.classList.add('is-visible')
       }))
-      await sleep(1800) // hold question alone before answers appear
+      await sleep(1800)
       for (const text of answers) {
         if (skipped) break
         const aEl = document.createElement('p')
@@ -319,10 +332,13 @@ class Engine {
         aEl.textContent = text
         block.appendChild(aEl)
         introElements.push(aEl)
+        answerCount++
+        recentre()
         requestAnimationFrame(() => requestAnimationFrame(() => aEl.classList.add('is-visible')))
         await sleep(950)
       }
-      await sleep(2200) // hold full block
+      await sleep(2200)
+      block.style.transform = `translate(-50%, calc(-50% - ${answerCount * 1.3 + 1}rem))`
       block.classList.remove('is-visible')
       await sleep(700)
       block.remove()
@@ -440,20 +456,54 @@ class Engine {
     document.body.classList.add('is-ready')
     introScreen?.remove()
     setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
-    this.music.loadTrack(2, false)
-    this.music.unmute()
   }
 
-  startMusicOnInteraction() {
-    let started = false
-    const handler = () => {
-      if (started) return
-      started = true
-      this.music.unmute()
+  waitForStart() {
+    return new Promise((resolve) => {
+      const el = document.createElement('div')
+      el.className = 'start-screen'
+      el.innerHTML = `
+        <button class="start-screen__btn">Start</button>
+        <p class="start-screen__hint">or press space</p>
+      `
+      document.body.appendChild(el)
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')))
+
+      const finish = () => {
+        el.classList.add('is-exiting')
+        el.addEventListener('transitionend', () => el.remove(), { once: true })
+        window.removeEventListener('keydown', onKey)
+        resolve()
+      }
+
+      const onKey = (e) => {
+        if (e.key === ' ') { e.preventDefault(); finish() }
+      }
+
+      el.querySelector('.start-screen__btn').addEventListener('click', finish, { once: true })
+      window.addEventListener('keydown', onKey)
+    })
+  }
+
+  initTheEnd() {
+    const el = document.createElement('div')
+    el.className = 'the-end-overlay'
+    el.innerHTML = `
+      <p class="the-end-overlay__text">The End</p>
+      <p class="the-end-overlay__sub">Scroll back to explore</p>
+    `
+    document.body.appendChild(el)
+    this.theEndOverlay = el
+    this._theEndVisible = false
+  }
+
+  updateTheEnd() {
+    if (!this.theEndOverlay || !this.scroll.isInitialized) return
+    const atEnd = this.camera.position.z <= this.scroll.minCameraZ + 0.15
+    if (atEnd !== this._theEndVisible) {
+      this._theEndVisible = atEnd
+      this.theEndOverlay.classList.toggle('is-visible', atEnd)
     }
-    ;['pointerdown', 'keydown'].forEach((e) =>
-      document.addEventListener(e, handler, { once: true, passive: true })
-    )
   }
 
   replayIntro() {
@@ -794,6 +844,7 @@ class Engine {
     this.updateProgressBar()
     this.updatePhotoCounter()
     this.updateAmbientColor()
+    this.updateTheEnd()
 
     this.renderer.clear(true, true, true)
     this.experience.background.render(this.renderer)
