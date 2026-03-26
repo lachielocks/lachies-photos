@@ -240,7 +240,7 @@ class Engine {
       this.hideLoadingScreen()
       setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
       this.music.loadTrack(2, false)
-      this.startMusicOnInteraction()
+      this.music.unmute()
       return
     }
 
@@ -441,7 +441,7 @@ class Engine {
     introScreen?.remove()
     setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
     this.music.loadTrack(2, false)
-    this.startMusicOnInteraction()
+    this.music.unmute()
   }
 
   startMusicOnInteraction() {
