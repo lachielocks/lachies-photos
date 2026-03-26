@@ -209,11 +209,27 @@ class Engine {
   }
 
   async playIntroReveal(playIntro) {
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+    // ── Skip mechanism ────────────────────────────────────────────────────────
+    let skipped = false
+    let resolveSkip
+    const skipPromise = new Promise((r) => { resolveSkip = r })
+    const introElements = [] // track all dynamically created elements for cleanup
 
+    const skipIntro = () => {
+      if (skipped) return
+      skipped = true
+      resolveSkip()
+      introElements.forEach((el) => el.remove())
+    }
+
+    const sleep = (ms) => {
+      if (skipped) return Promise.resolve()
+      return Promise.race([new Promise((r) => setTimeout(r, ms)), skipPromise])
+    }
+    const nextFrame = () => new Promise((r) => requestAnimationFrame(r))
     const introScreen = document.getElementById('intro-screen')
 
+    // ── Non-first-visit fast path ─────────────────────────────────────────────
     if (!playIntro) {
       introScreen?.remove()
       this.experience.gallery?.startIntroAnimation()
@@ -228,35 +244,119 @@ class Engine {
     // ── First-visit intro ─────────────────────────────────────────────────────
     document.getElementById('loading-screen')?.remove()
 
-    // Show a text card, hold, then fade it out. Returns after element is removed.
+    // Wire up the skip button — appears after 1.5s
+    const skipBtn = document.querySelector('.intro-skip-btn')
+    if (skipBtn) {
+      setTimeout(() => { if (!skipped) skipBtn.classList.add('is-visible') }, 1500)
+      skipBtn.addEventListener('click', skipIntro, { once: true })
+    }
+
+    // Small centred text card (existing style)
     const showHint = (text, holdMs = 1400) => {
+      if (skipped) return Promise.resolve()
       const el = document.createElement('p')
       el.className = 'intro-hint-overlay'
       el.textContent = text
       document.body.appendChild(el)
+      introElements.push(el)
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')))
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          el.classList.remove('is-visible')
-          el.classList.add('is-out')
-          setTimeout(() => { el.remove(); resolve() }, 700)
-        }, holdMs)
-      })
+      return Promise.race([
+        new Promise((resolve) => {
+          setTimeout(() => {
+            el.classList.remove('is-visible')
+            el.classList.add('is-out')
+            setTimeout(() => { el.remove(); resolve() }, 700)
+          }, holdMs)
+        }),
+        skipPromise,
+      ])
     }
 
-    // ── Phase 1: cinematic text cards on the dark screen ──────────────────────
+    // Large standalone centred text card
+    const showStandaloneCard = (text, holdMs = 2500) => {
+      if (skipped) return Promise.resolve()
+      const el = document.createElement('p')
+      el.className = 'intro-standalone-card'
+      el.textContent = text
+      document.body.appendChild(el)
+      introElements.push(el)
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')))
+      return Promise.race([
+        new Promise((resolve) => {
+          setTimeout(() => {
+            el.classList.remove('is-visible')
+            el.classList.add('is-out')
+            setTimeout(() => { el.remove(); resolve() }, 800)
+          }, holdMs)
+        }),
+        skipPromise,
+      ])
+    }
+
+    // Stacking Q&A block — question first, then answers appear below it
+    const showCinematicBlock = async (question, answers) => {
+      if (skipped) return
+      const block = document.createElement('div')
+      block.className = 'intro-cinematic-block'
+      const qEl = document.createElement('p')
+      qEl.className = 'intro-cinematic-question'
+      qEl.textContent = question
+      block.appendChild(qEl)
+      document.body.appendChild(block)
+      introElements.push(block)
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        block.classList.add('is-visible')
+        qEl.classList.add('is-visible')
+      }))
+      await sleep(1800) // hold question alone before answers appear
+      for (const text of answers) {
+        if (skipped) break
+        const aEl = document.createElement('p')
+        aEl.className = 'intro-cinematic-answer'
+        aEl.textContent = text
+        block.appendChild(aEl)
+        introElements.push(aEl)
+        requestAnimationFrame(() => requestAnimationFrame(() => aEl.classList.add('is-visible')))
+        await sleep(950)
+      }
+      await sleep(2200) // hold full block
+      block.classList.remove('is-visible')
+      await sleep(700)
+      block.remove()
+    }
+
+    // ── Phase 1: philosophical Q&A ────────────────────────────────────────────
     await sleep(600)
+    await showCinematicBlock('Why do we take photos?', [
+      'To stop time.',
+      'To remember how it felt.',
+      'To show someone what we saw.',
+      'To say — I was here.',
+    ])
+
+    // ── Phase 2: standalone reflections ──────────────────────────────────────
+    await sleep(300)
+    await showStandaloneCard('The best camera is the one you have with you.')
+    await sleep(300)
+    await showStandaloneCard("A photo doesn't change. The memory behind it does.")
+    await sleep(300)
+    await showStandaloneCard("You don't take a photograph. You make it.")
+    await sleep(400)
+
+    // ── Phase 3: instructions ─────────────────────────────────────────────────
     await showHint('Use the arrow keys to explore.', 1400)
     await sleep(200)
     await showHint('Press space to expand.', 1400)
     await sleep(200)
+
+    // ── Phase 4: presenter cards ──────────────────────────────────────────────
     await showHint('Lachie Thurlow presents', 1400)
     await sleep(300)
-
     const titleEl = document.createElement('p')
     titleEl.className = 'intro-hint-overlay intro-hint-overlay--title'
     titleEl.textContent = "Lachie's Photos"
     document.body.appendChild(titleEl)
+    introElements.push(titleEl)
     requestAnimationFrame(() => requestAnimationFrame(() => titleEl.classList.add('is-visible')))
     await sleep(1800)
     titleEl.classList.remove('is-visible')
@@ -265,71 +365,71 @@ class Engine {
     titleEl.remove()
     await sleep(300)
 
-    // ── Phase 2: trail swirls on dark background (no photo planes) ────────────
-    // Hide planes so only the trail + background gradient are visible
+    // Hide skip button — it's no longer needed after text phase
+    if (skipBtn) skipBtn.classList.remove('is-visible')
+
+    // ── Phase 5: trail swirl ──────────────────────────────────────────────────
     const planes = this.experience.gallery?.planes ?? []
     planes.forEach((p) => { p.visible = false })
-
-    // Fade dark overlay to near-transparent — trail becomes visible
-    if (introScreen) {
-      introScreen.style.transition = 'opacity 900ms cubic-bezier(0.4, 0, 1, 1)'
-      introScreen.style.opacity = '0.04'
-    }
-
-    // Sweep all the way to the last photo, accelerating exponentially.
-    // easeInExpo: nearly still at the start, then RUSHES to the end.
     const startScroll = this.scroll.scrollCurrent ?? 0
     const maxScroll = this.scroll.scrollFromCameraZ(this.scroll.minCameraZ)
-    const sweepDuration = 4000 // ms — slow start, explosive finish
 
-    let skipped = false
-    const skipHandler = () => { skipped = true }
-    window.addEventListener('keydown', skipHandler, { once: true })
-
-    await new Promise((resolve) => {
-      const sweepStart = performance.now()
-      const tick = () => {
-        if (skipped) { resolve(); return }
-        const elapsed = performance.now() - sweepStart
-        const t = Math.min(elapsed / sweepDuration, 1)
-        // Exponential ease-in: creeps at first, then explodes to the end
-        const eased = t === 0 ? 0 : Math.pow(2, 10 * t - 10)
-        this.scroll.scrollTarget = startScroll + eased * (maxScroll - startScroll)
-        this.scroll.scrollCurrent = this.scroll.scrollTarget
-        if (t < 1) { requestAnimationFrame(tick) } else { resolve() }
+    if (!skipped) {
+      if (introScreen) {
+        introScreen.style.transition = 'opacity 900ms cubic-bezier(0.4, 0, 1, 1)'
+        introScreen.style.opacity = '0.04'
       }
-      requestAnimationFrame(tick)
-    })
+      const sweepDuration = 4000
+      let sweepSkipped = false
+      const sweepSkipHandler = () => { sweepSkipped = true }
+      window.addEventListener('keydown', sweepSkipHandler, { once: true })
+      await new Promise((resolve) => {
+        const sweepStart = performance.now()
+        const tick = () => {
+          if (sweepSkipped) { resolve(); return }
+          const elapsed = performance.now() - sweepStart
+          const t = Math.min(elapsed / sweepDuration, 1)
+          const eased = t === 0 ? 0 : Math.pow(2, 10 * t - 10)
+          this.scroll.scrollTarget = startScroll + eased * (maxScroll - startScroll)
+          this.scroll.scrollCurrent = this.scroll.scrollTarget
+          if (t < 1) { requestAnimationFrame(tick) } else { resolve() }
+        }
+        requestAnimationFrame(tick)
+      })
+      window.removeEventListener('keydown', sweepSkipHandler)
 
-    window.removeEventListener('keydown', skipHandler)
+      // ── Phase 6: white flash ────────────────────────────────────────────────
+      if (introScreen) {
+        introScreen.style.transition = 'none'
+        introScreen.style.background = '#ffffff'
+        introScreen.style.opacity = '1'
+      }
+      await sleep(60)
 
-    // ── Phase 3: white flash — the trail vanishes into blinding light ─────────
-    if (introScreen) {
-      introScreen.style.transition = 'none'
-      introScreen.style.background = '#ffffff'
-      introScreen.style.opacity = '1'
+      // ── Phase 7: TV turn-off ────────────────────────────────────────────────
+      const tvEl = document.createElement('div')
+      tvEl.className = 'intro-tvoff-overlay'
+      document.body.appendChild(tvEl)
+      if (introScreen) introScreen.style.opacity = '0'
+      await nextFrame()
+      await nextFrame()
+      tvEl.classList.add('is-active')
+      await sleep(900)
+      tvEl.remove()
+      await sleep(300)
+    } else {
+      // Skipped — quick fade out of the intro screen
+      if (introScreen) {
+        introScreen.style.transition = 'opacity 400ms ease'
+        introScreen.style.opacity = '0'
+      }
+      await new Promise((r) => setTimeout(r, 400))
     }
-    await sleep(60) // one-frame flash hold
 
-    // ── Phase 4: TV turn-off — line collapses to a dot, everything goes black ──
-    const tvEl = document.createElement('div')
-    tvEl.className = 'intro-tvoff-overlay'
-    document.body.appendChild(tvEl)
-    if (introScreen) introScreen.style.opacity = '0' // intro-screen no longer needed
-    await nextFrame()
-    await nextFrame()
-    tvEl.classList.add('is-active')
-    await sleep(900) // match introTvOff duration
-
-    // After TV-off completes, hold on black before the reveal
-    tvEl.remove()
-    await sleep(300)
-
-    // ── Phase 5: snap scroll to first photo, epic reveal ─────────────────────
+    // ── Phase 8: gallery reveal ───────────────────────────────────────────────
     this.scroll.scrollTarget = startScroll
     this.scroll.scrollCurrent = startScroll
     planes.forEach((p) => { p.visible = true })
-
     Intro.markPlayed()
     this.experience.gallery?.startIntroAnimation()
     await nextFrame()
