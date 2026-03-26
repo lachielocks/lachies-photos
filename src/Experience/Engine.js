@@ -504,6 +504,7 @@ class Engine {
     if (atEnd !== this._theEndVisible) {
       this._theEndVisible = atEnd
       this.theEndOverlay.classList.toggle('is-visible', atEnd)
+      document.body.classList.toggle('is-at-end', atEnd)
     }
   }
 

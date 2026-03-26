@@ -134,6 +134,11 @@ body.frame-text-dark {
   opacity: 1;
 }
 
+body.is-at-end .plane-label-overlay {
+  opacity: 0 !important;
+  transform: translateY(8px);
+}
+
 .the-end-overlay__text {
   margin: 0;
   font-family: var(--ui-font);
