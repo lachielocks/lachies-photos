@@ -308,6 +308,13 @@ class Scroll {
     this.isDebugBound = true
   }
 
+  snapToNearestPlane() {
+    const blendData = this.gallery.getPlaneBlendData(this.camera.position.z)
+    if (!blendData) return
+    const index = blendData.blend >= 0.5 ? blendData.nextPlaneIndex : blendData.currentPlaneIndex
+    this.navigateToPlane(index)
+  }
+
   navigateRelative(delta) {
     const blendData = this.gallery.getPlaneBlendData(this.camera.position.z)
     if (!blendData) return

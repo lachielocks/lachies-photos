@@ -17,6 +17,52 @@ class Cursor {
     this.ringEl = null
     this.labelEl = null
 
+    this.touchStartY = 0
+    this.touchStartX = 0
+    this.touchStartTime = 0
+
+    this.onTouchStart = (e) => {
+      const touch = e.touches[0]
+      this.touchStartY = touch.clientY
+      this.touchStartX = touch.clientX
+      this.touchStartTime = Date.now()
+    }
+
+    this.onTouchEnd = (e) => {
+      if (e.target.closest('button, a, input, select, nav')) return
+
+      const touch = e.changedTouches[0]
+      const deltaY = this.touchStartY - touch.clientY
+      const deltaX = this.touchStartX - touch.clientX
+      const absY = Math.abs(deltaY)
+      const absX = Math.abs(deltaX)
+
+      // Tap — expand/collapse
+      if (absY < 15 && absX < 15) {
+        e.preventDefault()
+        if (this.isExpanded) {
+          this.collapse()
+        } else if (this.camera) {
+          const blendData = this.gallery.getPlaneBlendData(this.camera.position.z)
+          if (blendData) {
+            const index = blendData.blend >= 0.5 ? blendData.nextPlaneIndex : blendData.currentPlaneIndex
+            this.expand(index)
+          }
+        }
+        return
+      }
+
+      // Decisive vertical swipe — snap to next/prev photo
+      if (absY >= 50 && absY > absX * 0.8) {
+        e.preventDefault()
+        this.scroll.navigateRelative(deltaY > 0 ? 1 : -1)
+        return
+      }
+
+      // Short or ambiguous drag — snap back to nearest photo
+      this.scroll.snapToNearestPlane()
+    }
+
     this.onMouseMove = (e) => {
       this.clientX = e.clientX
       this.clientY = e.clientY
@@ -44,23 +90,32 @@ class Cursor {
     }
   }
 
+  isTouchDevice() {
+    return window.matchMedia('(pointer: coarse)').matches
+  }
+
   init(camera) {
     this.camera = camera
 
-    const el = document.createElement('div')
-    el.className = 'custom-cursor is-offscreen'
-    el.innerHTML = `
-      <div class="custom-cursor__ring"></div>
-      <span class="custom-cursor__label"></span>
-    `
-    document.body.appendChild(el)
-    this.el = el
-    this.ringEl = el.querySelector('.custom-cursor__ring')
-    this.labelEl = el.querySelector('.custom-cursor__label')
+    if (!this.isTouchDevice()) {
+      const el = document.createElement('div')
+      el.className = 'custom-cursor is-offscreen'
+      el.innerHTML = `
+        <div class="custom-cursor__ring"></div>
+        <span class="custom-cursor__label"></span>
+      `
+      document.body.appendChild(el)
+      this.el = el
+      this.ringEl = el.querySelector('.custom-cursor__ring')
+      this.labelEl = el.querySelector('.custom-cursor__label')
 
-    document.addEventListener('mousemove', this.onMouseMove)
-    document.documentElement.addEventListener('mouseleave', this.onMouseLeave)
-    document.addEventListener('click', this.onClick)
+      document.addEventListener('mousemove', this.onMouseMove)
+      document.documentElement.addEventListener('mouseleave', this.onMouseLeave)
+      document.addEventListener('click', this.onClick)
+    }
+
+    document.addEventListener('touchstart', this.onTouchStart, { passive: true })
+    document.addEventListener('touchend', this.onTouchEnd, { passive: false })
   }
 
   expand(planeIndex) {
@@ -133,6 +188,8 @@ class Cursor {
     document.removeEventListener('mousemove', this.onMouseMove)
     document.documentElement.removeEventListener('mouseleave', this.onMouseLeave)
     document.removeEventListener('click', this.onClick)
+    document.removeEventListener('touchstart', this.onTouchStart)
+    document.removeEventListener('touchend', this.onTouchEnd)
     this.el?.remove()
     this.el = null
     this.ringEl = null

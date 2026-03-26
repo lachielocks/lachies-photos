@@ -2,7 +2,14 @@
 *::after,
 *::before {
   box-sizing: border-box;
-  cursor: none !important;
+}
+
+@media (pointer: fine) {
+  *,
+  *::after,
+  *::before {
+    cursor: none !important;
+  }
 }
 
 :root {
