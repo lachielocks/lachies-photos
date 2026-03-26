@@ -240,7 +240,7 @@ class Engine {
       this.hideLoadingScreen()
       setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
       this.music.loadTrack(2, false)
-      this.music.unmute()
+      this.startMusicOnInteraction()
       return
     }
 
@@ -441,7 +441,19 @@ class Engine {
     introScreen?.remove()
     setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
     this.music.loadTrack(2, false)
-    this.music.unmute()
+    this.startMusicOnInteraction()
+  }
+
+  startMusicOnInteraction() {
+    let started = false
+    const handler = () => {
+      if (started) return
+      started = true
+      this.music.unmute()
+    }
+    ;['pointerdown', 'keydown'].forEach((e) =>
+      document.addEventListener(e, handler, { once: true, passive: true })
+    )
   }
 
   replayIntro() {
