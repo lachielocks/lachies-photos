@@ -1,17 +1,16 @@
 {
-  "name": "codrops-atmospheric-depth-gallery",
+  "name": "lachies-photos",
   "version": "1.0.0",
-  "description": "A Three.js depth gallery where images shape their own environment — mood-driven GLSL backgrounds, parallax motion, and velocity-reactive effects.",
+  "description": "Lachie's photography class gallery.",
   "author": {
-    "name": "Houmahani Kane",
-    "email": "houm.kane@gmail.com",
-    "url": "https://github.com/houmahani/"
+    "name": "Lachie T",
+    "url": "https://github.com/lachielocks"
   },
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/houmahani/codrops-depth-gallery"
+    "url": "https://github.com/lachielocks/codrops-depth-gallery"
   },
   "scripts": {
     "dev": "vite",

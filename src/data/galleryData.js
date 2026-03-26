@@ -449,7 +449,7 @@ const galleryPlaneData = [
     label: {
       word: 'Galaga',
       navTitle: 'Galaga',
-      description: 'This photo was taken at the Lego Relics exhibition. Up Up Down Down Left Right Left Right B A Start',
+      description: 'Up Up Down Down Left Right Left Right B A Start',
       iso: '400',
       av: 'f/1.5',
       tv: '1/50',
