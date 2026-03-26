@@ -34,6 +34,7 @@ const galleryPlaneData = [
     blob2Color: '#7a4a6a',
     label: {
       word: 'The Tallest Tree',
+      tags: ['Dee Why', 'Edited'],
       description: 'This highly edited photo was taken on the Dee Why Beach excursion where we were tasked with finding the tallest tree. This one caught my eye instantly. I had to get the photo. This photo was edited using Luminar Neo.',
       iso: '125',
       av: 'f/22',
@@ -53,6 +54,7 @@ const galleryPlaneData = [
     label: {
       word: 'The Tallest Tree',
       navTitle: 'The Tallest Tree - Raw',
+      tags: ['Dee Why'],
       description: 'This is the raw, unedited version of the previous image.',
       iso: '125',
       av: 'f/22',
@@ -71,6 +73,7 @@ const galleryPlaneData = [
     blob2Color: '#7a8a8a',
     label: {
       word: 'Cliffface',
+      tags: ['Dee Why', 'Shutter Speed'],
       description: 'This image is focused on the flowing water off the edge of the platform, with the rocks in the background. I really like how the camera captures the essence of the water flowing off the little cliff face.',
       iso: '100',
       av: 'f/4.5',
@@ -89,6 +92,7 @@ const galleryPlaneData = [
     blob2Color: '#c8a870',
     label: {
       word: 'Frozen in Time',
+      tags: ['Dee Why', 'Shutter Speed'],
       description: 'This photograph was set to the fastest shutter speed, to capture a still image of water. It captures the water beautifully, as if it were frozen in time.',
       iso: '1,600',
       av: 'f/6.3',
@@ -107,6 +111,7 @@ const galleryPlaneData = [
     blob2Color: '#5a8a3a',
     label: {
       word: 'Odd One Out',
+      tags: ['Dee Why', 'Aperture'],
       description: 'This image shows beautiful contrast, depicting an orange flower, standing alone in clear beauty, in a field of green. It instantly captures the eye, and is just a beautiful shot.',
       iso: '100',
       av: 'f/5',
@@ -125,6 +130,7 @@ const galleryPlaneData = [
     blob2Color: '#3a6a2a',
     label: {
       word: 'Canopy',
+      tags: ['Dee Why', 'Aperture'],
       description: 'Looking straight up into the crown of a pine tree, the dense needle-covered branches reach toward a clear blue sky. The lens flare adds a natural warmth to the shot, capturing the sheer scale and texture of the tree from below.',
       iso: '800',
       av: 'f/22',
@@ -143,6 +149,7 @@ const galleryPlaneData = [
     blob2Color: '#4a6a3a',
     label: {
       word: 'Promenade',
+      tags: ['Dee Why', 'Leading Lines'],
       description: 'The stone wall draws the eye along a natural leading line toward the row of pines stretching into the distance. The contrast between the textured, pebbled wall in the foreground and the busy beachside strip behind gives the shot a real sense of depth and place.',
       iso: '500',
       av: 'f/22',
@@ -161,6 +168,7 @@ const galleryPlaneData = [
     blob2Color: '#8a9aa8',
     label: {
       word: 'Flow',
+      tags: ['Shutter Speed', 'Water'],
       description: 'A close-up of a drinking fountain spout catching the water mid-flow. I love how the slower shutter speed gives the stream this silky, fluid look; like it\'s alive.',
       iso: '200',
       av: 'f/8',
@@ -179,6 +187,7 @@ const galleryPlaneData = [
     blob2Color: '#a0aab8',
     label: {
       word: 'Freeze',
+      tags: ['Shutter Speed', 'Water'],
       description: 'A close-up of a drinking fountain arc, where the fast shutter speed makes the water look completely solid — like glass. You can see every bump and ripple in the stream, which is something you\'d obviously never notice with the naked eye.',
       iso: '5,000',
       av: 'f/7.1',
@@ -197,6 +206,7 @@ const galleryPlaneData = [
     blob2Color: '#8a1010',
     label: {
       word: 'Droplet',
+      tags: ['Aperture', 'Shutter Speed', 'Water Balloon'],
       description: 'A water balloon shot against a pure black background, the teardrop shape and little water droplets on the surface make it look like a giant drop of water. The red really pops against the dark backdrop.',
       iso: '6,400',
       av: 'f/7.1',
@@ -215,6 +225,7 @@ const galleryPlaneData = [
     blob2Color: '#c09060',
     label: {
       word: 'Ripple',
+      tags: ['Aperture', 'Shutter Speed', 'Water Balloon'],
       description: 'The moment just before impact, ripples spread across the surface of a blue water balloon as it struggles to hold together, barely hanging on before it gives in.',
       iso: '6,400',
       av: 'f/7.1',
@@ -233,6 +244,7 @@ const galleryPlaneData = [
     blob2Color: '#d0a880',
     label: {
       word: 'Pop!',
+      tags: ['Aperture', 'Shutter Speed', 'Water Balloon'],
       description: 'The moment the balloon gives in — water exploding in every direction against the black background, with just the hand left in the middle of the chaos.',
       iso: '6,400',
       av: 'f/7.1',
@@ -252,6 +264,7 @@ const galleryPlaneData = [
     label: {
       word: 'Luna on a Couch',
       navTitle: 'Luna on a Couch',
+      tags: ['Luna'],
       description: "She's cute, she's on a couch. It's lovely.",
       iso: '320',
       av: 'f/4.5',
@@ -271,6 +284,7 @@ const galleryPlaneData = [
     label: {
       word: 'Luna in a Park',
       navTitle: 'Luna in a Park',
+      tags: ['Luna'],
       description: "She's cute, she's in a park. It's lovely.",
       iso: '320',
       av: 'f/4.5',
@@ -290,6 +304,7 @@ const galleryPlaneData = [
     label: {
       word: 'Luna in the Dirt',
       navTitle: 'Luna in the Dirt',
+      tags: ['Luna'],
       description: "She's cute, she's in the dirt. It's lovely.",
       iso: '500',
       av: 'f/4.5',
@@ -309,6 +324,7 @@ const galleryPlaneData = [
     label: {
       word: 'Trashed I',
       navTitle: 'Trashed I',
+      tags: ['Relics', 'iPhone'],
       description: 'This photo was taken at the Lego Relics exhibition. It\'s quite fun, bringing all the carboard and rubbish to life with lego and making it look really fun!',
       iso: '640',
       av: 'f/1.5',
@@ -329,6 +345,7 @@ const galleryPlaneData = [
     label: {
       word: 'Trashed II',
       navTitle: 'Trashed II',
+      tags: ['Relics', 'iPhone'],
       description: 'This photo was taken at the Lego Relics exhibition. This is just a different angle of the previous photo.',
       iso: '640',
       av: 'f/1.5',
@@ -349,6 +366,7 @@ const galleryPlaneData = [
     label: {
       word: 'Not a Fan',
       navTitle: 'Not a Fan',
+      tags: ['Relics', 'iPhone'],
       description: "This photo was taken at the Lego Relics exhibition. I love this one! They brought an old fridge to life, it's so cool to see all the little details with the whole 'frozen kingdom' in there!",
       iso: '160',
       av: 'f/1.5',
@@ -369,6 +387,7 @@ const galleryPlaneData = [
     label: {
       word: 'Punchbug!',
       navTitle: 'Punchbug!',
+      tags: ['Relics', 'iPhone'],
       description: "This photo was taken at the Lego Relics exhibition. A whole city thriving off of waste energy from the back of a Volkswagon Beetle? That's what I call art.",
       iso: '640',
       av: 'f/1.5',
@@ -389,6 +408,7 @@ const galleryPlaneData = [
     label: {
       word: 'The Outlier',
       navTitle: 'The Outlier',
+      tags: ['Relics', 'iPhone'],
       description: 'This photo was taken at the Lego Relics exhibition. Solar panels among the nuclear Beetle engine, thanks for your cooperation in saving the climate.',
       iso: '500',
       av: 'f/1.8',
@@ -409,6 +429,7 @@ const galleryPlaneData = [
     label: {
       word: 'Powerful Up Close',
       navTitle: 'Powerful Up Close',
+      tags: ['Relics', 'iPhone'],
       description: 'This photo was taken at the Lego Relics exhibition. Zoomed it in, more detail, rock fuel, gneiss! (Look that up it\'s funny I promise...)',
       iso: '800',
       av: 'f/2.8',
@@ -429,6 +450,7 @@ const galleryPlaneData = [
     label: {
       word: 'Beach Day',
       navTitle: 'Beach Day',
+      tags: ['Relics', 'iPhone'],
       description: "This photo was taken at the Lego Relics exhibition. A beachside community living out of your dad's old jetski... absolute cinema.",
       iso: '320',
       av: 'f/1.5',
@@ -449,6 +471,7 @@ const galleryPlaneData = [
     label: {
       word: 'Galaga',
       navTitle: 'Galaga',
+      tags: ['Relics', 'iPhone'],
       description: 'Up Up Down Down Left Right Left Right B A Start',
       iso: '400',
       av: 'f/1.5',
@@ -469,6 +492,7 @@ const galleryPlaneData = [
     label: {
       word: 'Amplified',
       navTitle: 'Amplified',
+      tags: ['Relics', 'iPhone'],
       description: "This photo was taken at the Lego Relics exhibition. I'm sure the music rocks.",
       iso: '160',
       av: 'f/1.5',

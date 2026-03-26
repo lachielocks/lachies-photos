@@ -58,7 +58,24 @@ class Nav {
         this.downloadPhoto?.(index)
       })
 
-      li.append(number, title, downloadBtn)
+      const row = document.createElement('div')
+      row.className = 'gallery-nav__item-row'
+      row.append(number, title, downloadBtn)
+      li.append(row)
+
+      const tags = plane.label?.tags || []
+      if (tags.length) {
+        const tagsDiv = document.createElement('div')
+        tagsDiv.className = 'gallery-nav__tags'
+        tags.forEach((tag) => {
+          const span = document.createElement('span')
+          span.className = 'gallery-nav__tag'
+          span.textContent = tag
+          tagsDiv.append(span)
+        })
+        li.append(tagsDiv)
+      }
+
       li.addEventListener('click', () => {
         this.navigateTo?.(index)
         this.close()
