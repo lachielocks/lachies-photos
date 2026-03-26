@@ -183,7 +183,8 @@ class Engine {
       this.scroll.bindEvents()
       this.nav.init(
         (index) => this.scroll.navigateToPlane(index),
-        (index) => this.downloadPhoto(index)
+        (index) => this.downloadPhoto(index),
+        () => this.replayIntro()
       )
       this.initArrows()
       this.initPresentToggle()
@@ -238,6 +239,8 @@ class Engine {
       document.body.classList.add('is-ready')
       this.hideLoadingScreen()
       setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
+      this.music.loadTrack(2, false)
+      this.music.unmute()
       return
     }
 
@@ -437,6 +440,13 @@ class Engine {
     document.body.classList.add('is-ready')
     introScreen?.remove()
     setTimeout(() => document.body.classList.add('is-intro-done'), 1200)
+    this.music.loadTrack(2, false)
+    this.music.unmute()
+  }
+
+  replayIntro() {
+    Intro.reset()
+    window.location.reload()
   }
 
   setLoadingStep(step, state) {

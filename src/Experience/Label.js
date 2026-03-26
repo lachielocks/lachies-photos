@@ -12,7 +12,6 @@ class Label {
     this.avValueElement = null
     this.tvValueElement = null
     this.focalValueElement = null
-    this.tagsElement = null
     this.activePlaneIndex = -1
   }
 
@@ -24,7 +23,6 @@ class Label {
         <p class="plane-label-overlay__index"></p>
         <p class="plane-label-card__word"></p>
         <p class="plane-label-card__description"></p>
-        <div class="plane-label-overlay__tags"></div>
         <span class="plane-label-overlay__chip"></span>
       </div>
       <article class="plane-label-card plane-label-overlay__right">
@@ -64,7 +62,6 @@ class Label {
       avValueElement: element.querySelector('.plane-label-card__value--av'),
       tvValueElement: element.querySelector('.plane-label-card__value--tv'),
       focalValueElement: element.querySelector('.plane-label-card__value--focal'),
-      tagsElement: element.querySelector('.plane-label-overlay__tags'),
     }
   }
 
@@ -82,7 +79,6 @@ class Label {
       avValueElement,
       tvValueElement,
       focalValueElement,
-      tagsElement,
     } = this.createElement()
 
     this.overlayElement = element
@@ -95,7 +91,6 @@ class Label {
     this.avValueElement = avValueElement
     this.tvValueElement = tvValueElement
     this.focalValueElement = focalValueElement
-    this.tagsElement = tagsElement
     this.overlayElement.style.opacity = '0'
 
     document.body.append(this.overlayElement)
@@ -207,22 +202,6 @@ class Label {
     this.slideIn(this.wordElement, labelData.word || '', isFirstLoad ? 0 : 80)
     this.slideIn(this.descriptionElement, labelData.description || '', isFirstLoad ? 0 : 130)
 
-    // Tags
-    if (this.tagsElement) {
-      this.tagsElement.innerHTML = ''
-      const tags = labelData.tags || []
-      tags.forEach((tag, i) => {
-        const span = document.createElement('span')
-        span.className = 'plane-label-overlay__tag'
-        span.textContent = tag
-        span.animate(
-          [{ opacity: 0, transform: 'translateY(5px)' }, { opacity: 1, transform: 'translateY(0)' }],
-          { duration: 380, delay: isFirstLoad ? i * 40 : 160 + i * 40, easing: 'ease-out', fill: 'both' }
-        )
-        this.tagsElement.append(span)
-      })
-    }
-
     // Chip spring-pop
     this.animateChip(chipHex)
 
@@ -279,7 +258,6 @@ class Label {
     this.avValueElement = null
     this.tvValueElement = null
     this.focalValueElement = null
-    this.tagsElement = null
     this.activePlaneIndex = -1
   }
 }

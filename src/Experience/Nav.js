@@ -8,11 +8,13 @@ class Nav {
     this.toggleElement = null
     this.navigateTo = null
     this.downloadPhoto = null
+    this.replayIntro = null
   }
 
-  init(navigateTo, downloadPhoto) {
+  init(navigateTo, downloadPhoto, replayIntro) {
     this.navigateTo = navigateTo
     this.downloadPhoto = downloadPhoto
+    this.replayIntro = replayIntro
     this.navElement = document.querySelector('.gallery-nav')
     this.listElement = document.querySelector('.gallery-nav__list')
     this.toggleElement = document.querySelector('.frame__menu-toggle')
@@ -63,19 +65,6 @@ class Nav {
       row.append(number, title, downloadBtn)
       li.append(row)
 
-      const tags = plane.label?.tags || []
-      if (tags.length) {
-        const tagsDiv = document.createElement('div')
-        tagsDiv.className = 'gallery-nav__tags'
-        tags.forEach((tag) => {
-          const span = document.createElement('span')
-          span.className = 'gallery-nav__tag'
-          span.textContent = tag
-          tagsDiv.append(span)
-        })
-        li.append(tagsDiv)
-      }
-
       li.addEventListener('click', () => {
         this.navigateTo?.(index)
         this.close()
@@ -83,6 +72,16 @@ class Nav {
 
       this.listElement.append(li)
     })
+
+    const replayBtn = document.createElement('button')
+    replayBtn.className = 'gallery-nav__replay'
+    replayBtn.textContent = 'Replay Intro'
+    replayBtn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      this.close()
+      this.replayIntro?.()
+    })
+    this.navElement?.appendChild(replayBtn)
 
     const footer = document.createElement('p')
     footer.className = 'gallery-nav__footer'
