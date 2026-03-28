@@ -499,6 +499,7 @@ class Engine {
 
   updateTheEnd() {
     if (!this.theEndOverlay || !this.scroll.isInitialized) return
+    if (!document.body.classList.contains('is-intro-done')) return
     const lastPhotoZ = this.scroll.minCameraZ + this.scroll.theEndBuffer
     const atEnd = this.camera.position.z < lastPhotoZ - 1
     if (atEnd !== this._theEndVisible) {
