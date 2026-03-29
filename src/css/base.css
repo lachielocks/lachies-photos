@@ -72,6 +72,11 @@ body.frame-text-dark {
   pointer-events: none;
 }
 
+.start-screen__buttons {
+  display: flex;
+  gap: 1rem;
+}
+
 .start-screen__btn {
   background: none;
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -93,6 +98,17 @@ body.frame-text-dark {
   &:hover {
     color: #fff;
     border-color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.start-screen__btn--present {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.5);
+  transition-delay: 0ms, 0ms, 320ms, 320ms;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 }
 
