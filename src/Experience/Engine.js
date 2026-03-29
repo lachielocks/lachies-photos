@@ -69,6 +69,7 @@ class Engine {
       }
     }
     this.onKeyDown = (event) => {
+      if (!document.body.classList.contains('is-ready')) return
       if (event.repeat) return
       if (event.key.toLowerCase() === 'd') {
         this.setDebugUiVisible(!this.isDebugUiVisible)
@@ -399,13 +400,9 @@ class Engine {
         introScreen.style.opacity = '0.04'
       }
       const sweepDuration = 4000
-      let sweepSkipped = false
-      const sweepSkipHandler = () => { sweepSkipped = true }
-      window.addEventListener('keydown', sweepSkipHandler, { once: true })
       await new Promise((resolve) => {
         const sweepStart = performance.now()
         const tick = () => {
-          if (sweepSkipped) { resolve(); return }
           const elapsed = performance.now() - sweepStart
           const t = Math.min(elapsed / sweepDuration, 1)
           const eased = t === 0 ? 0 : Math.pow(2, 10 * t - 10)
@@ -415,7 +412,6 @@ class Engine {
         }
         requestAnimationFrame(tick)
       })
-      window.removeEventListener('keydown', sweepSkipHandler)
 
       // ── Phase 6: white flash ────────────────────────────────────────────────
       if (introScreen) {
@@ -463,7 +459,10 @@ class Engine {
       const el = document.createElement('div')
       el.className = 'start-screen'
       el.innerHTML = `
-        <button class="start-screen__btn">Start</button>
+        <div class="start-screen__buttons">
+          <button class="start-screen__btn">Start</button>
+          <button class="start-screen__btn start-screen__btn--present">Present</button>
+        </div>
         <p class="start-screen__hint">or press space</p>
       `
       document.body.appendChild(el)
@@ -481,6 +480,10 @@ class Engine {
       }
 
       el.querySelector('.start-screen__btn').addEventListener('click', finish, { once: true })
+      el.querySelector('.start-screen__btn--present').addEventListener('click', () => {
+        this.togglePresentMode()
+        finish()
+      }, { once: true })
       window.addEventListener('keydown', onKey)
     })
   }

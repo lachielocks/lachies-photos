@@ -30,6 +30,7 @@ class Cursor {
 
     this.onTouchEnd = (e) => {
       if (e.target.closest('button, a, input, select, nav')) return
+      if (!document.body.classList.contains('is-ready')) return
 
       const touch = e.changedTouches[0]
       const deltaY = this.touchStartY - touch.clientY
@@ -82,10 +83,15 @@ class Cursor {
     this.onClick = (e) => {
       // Don't intercept clicks on actual UI elements
       if (e.target.closest('button, a, input, select, nav')) return
+      if (!document.body.classList.contains('is-ready')) return
       if (this.isExpanded) {
         this.collapse()
-      } else if (this.hoveredPlaneIndex >= 0) {
-        this.expand(this.hoveredPlaneIndex)
+      } else if (this.camera) {
+        const blendData = this.gallery.getPlaneBlendData(this.camera.position.z)
+        if (blendData) {
+          const index = blendData.blend >= 0.5 ? blendData.nextPlaneIndex : blendData.currentPlaneIndex
+          this.expand(index)
+        }
       }
     }
   }
