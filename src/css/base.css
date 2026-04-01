@@ -837,10 +837,17 @@ body.is-presenting .frame::before {
   }
 }
 
+.carousel-main {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
 .carousel-image-wrap {
   flex: 1 1 0;
-  width: 100%;
-  min-height: 0;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -852,6 +859,45 @@ body.is-presenting .frame::before {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+.carousel-meta {
+  width: 9rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 4rem 1.5rem 1rem 0;
+}
+
+.carousel-specs {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.carousel-specs__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.carousel-specs__row dt {
+  font-family: var(--ui-font);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.22);
+  text-transform: uppercase;
+}
+
+.carousel-specs__row dd {
+  margin: 0;
+  font-family: var(--ui-font);
+  font-size: clamp(0.7rem, 1.2vw, 0.82rem);
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
 }
 
 .carousel-info {
