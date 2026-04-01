@@ -477,6 +477,7 @@ class Engine {
       const firstImgSrc = this.experience.gallery.planeConfig[0]?.textureSrc || ''
       el.innerHTML = `
         <p class="start-screen__title">Lachie's Photos</p>
+        <p class="start-screen__subtitle">Elements &amp; Principles of Photography</p>
         ${firstImgSrc ? `<div class="start-screen__preview"><img class="start-screen__preview-img" src="${firstImgSrc}" alt="The Tallest Tree" /></div>` : ''}
         <div class="start-screen__buttons">
           <button class="start-screen__btn" data-tooltip="Start the website normally.">Start</button>
