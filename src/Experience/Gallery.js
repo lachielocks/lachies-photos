@@ -198,6 +198,7 @@ class Gallery {
       tv: label.tv || '',
       focal: label.focal || '',
       color: label.color || fallback.color,
+      tags: Array.isArray(label.tags) ? label.tags : [],
     }
   }
 

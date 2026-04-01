@@ -474,7 +474,10 @@ class Engine {
     return new Promise((resolve) => {
       const el = document.createElement('div')
       el.className = 'start-screen'
+      const firstImgSrc = this.experience.gallery.planeConfig[0]?.textureSrc || ''
       el.innerHTML = `
+        <p class="start-screen__title">Lachie's Photos</p>
+        ${firstImgSrc ? `<div class="start-screen__preview"><img class="start-screen__preview-img" src="${firstImgSrc}" alt="The Tallest Tree" /></div>` : ''}
         <div class="start-screen__buttons">
           <button class="start-screen__btn" data-tooltip="Start the website normally.">Start</button>
           <button class="start-screen__btn start-screen__btn--present" data-tooltip="Start normally, but in fullscreen present mode.">Present</button>

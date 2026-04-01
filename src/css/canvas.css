@@ -345,6 +345,24 @@ body.is-presenting .plane-label-card__description {
   opacity: 1;
 }
 
+.plane-label-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  min-height: 0;
+}
+
+.plane-label-card__tag {
+  font-family: var(--ui-font);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.15rem 0.45rem;
+  white-space: nowrap;
+}
+
 .plane-label-overlay__chip {
   width: 18px;
   height: 18px;
