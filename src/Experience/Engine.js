@@ -6,6 +6,7 @@ import { Nav } from '@/Experience/Nav'
 import { Cursor } from '@/Experience/Cursor'
 import { Music } from '@/Experience/Music'
 import { Intro } from '@/Experience/Intro'
+import { Carousel } from '@/Experience/Carousel'
 
 class Engine {
   constructor(canvas, experience = world) {
@@ -48,6 +49,10 @@ class Engine {
 
     // Present mode
     this.isPresentMode = false
+
+    // Slideshow / carousel mode
+    this.isSlideshowMode = false
+    this.carousel = new Carousel()
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -212,6 +217,19 @@ class Engine {
   }
 
   async playIntroReveal(playIntro) {
+    // ── Slideshow mode: skip intro, open carousel overlay ─────────────────────
+    if (this.isSlideshowMode) {
+      const introScreen = document.getElementById('intro-screen')
+      introScreen?.remove()
+      document.getElementById('loading-screen')?.remove()
+      this.music.loadTrack(2, false)
+      document.body.classList.add('is-ready')
+      setTimeout(() => document.body.classList.add('is-intro-done'), 100)
+      this.hideLoadingScreen()
+      this.carousel.open()
+      return
+    }
+
     // ── Skip mechanism ────────────────────────────────────────────────────────
     let skipped = false
     let resolveSkip
@@ -463,6 +481,9 @@ class Engine {
           <button class="start-screen__btn">Start</button>
           <button class="start-screen__btn start-screen__btn--present">Present</button>
         </div>
+        <div class="start-screen__slideshow-row">
+          <button class="start-screen__btn start-screen__btn--present start-screen__btn--slideshow">Slideshow</button>
+        </div>
         <p class="start-screen__hint">or press space</p>
       `
       document.body.appendChild(el)
@@ -482,6 +503,10 @@ class Engine {
       el.querySelector('.start-screen__btn').addEventListener('click', finish, { once: true })
       el.querySelector('.start-screen__btn--present').addEventListener('click', () => {
         this.togglePresentMode()
+        finish()
+      }, { once: true })
+      el.querySelector('.start-screen__btn--slideshow').addEventListener('click', () => {
+        this.isSlideshowMode = true
         finish()
       }, { once: true })
       window.addEventListener('keydown', onKey)
