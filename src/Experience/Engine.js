@@ -482,7 +482,6 @@ class Engine {
         <div class="start-screen__slideshow-row">
           <button class="start-screen__btn start-screen__btn--present start-screen__btn--slideshow" data-tooltip="Start in a plain PowerPoint style presentation.">Slideshow</button>
         </div>
-        <p class="start-screen__hint">or press space</p>
       `
       document.body.appendChild(el)
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')))
