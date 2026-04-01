@@ -160,19 +160,19 @@ class Engine {
     const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 
     try {
-      // Step 1 — Loading Environment (minimum 1600ms)
+      // Step 1 — Loading Environment (minimum 400ms)
       this.setLoadingStep('environment', 'active')
       const envStart = performance.now()
-      await sleep(Math.max(0, 1600 - (performance.now() - envStart)))
+      await sleep(Math.max(0, 400 - (performance.now() - envStart)))
 
-      // Step 2 — Loading Photos (real progress, minimum 1600ms)
+      // Step 2 — Loading Photos (real progress, minimum 400ms)
       this.setLoadingStep('environment', 'done')
       this.setLoadingStep('photos', 'active')
       const photosStart = performance.now()
       this.preloadedTextures = await this.preloadTextures()
-      await sleep(Math.max(0, 1600 - (performance.now() - photosStart)))
+      await sleep(Math.max(0, 400 - (performance.now() - photosStart)))
 
-      // Step 3 — Rendering (minimum 1600ms)
+      // Step 3 — Rendering (minimum 400ms)
       this.setLoadingStep('photos', 'done')
       this.setLoadingStep('rendering', 'active')
       const renderStart = performance.now()
@@ -206,11 +206,11 @@ class Engine {
       this.applyDeepLink()
       this.isInitialized = true
       this.start()
-      await sleep(Math.max(0, 1600 - (performance.now() - renderStart)))
+      await sleep(Math.max(0, 400 - (performance.now() - renderStart)))
 
       // All done — brief pause showing all ticks
       this.setLoadingStep('rendering', 'done')
-      await sleep(900)
+      await sleep(400)
     } finally {
       await this.playIntroReveal(playIntro)
     }
