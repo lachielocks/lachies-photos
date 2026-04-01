@@ -6,6 +6,7 @@ import { Nav } from '@/Experience/Nav'
 import { Cursor } from '@/Experience/Cursor'
 import { Music } from '@/Experience/Music'
 import { Intro } from '@/Experience/Intro'
+import { Carousel } from '@/Experience/Carousel'
 
 class Engine {
   constructor(canvas, experience = world) {
@@ -48,6 +49,10 @@ class Engine {
 
     // Present mode
     this.isPresentMode = false
+
+    // Slideshow / carousel mode
+    this.isSlideshowMode = false
+    this.carousel = new Carousel()
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -235,6 +240,17 @@ class Engine {
     // ── Wait for start interaction (satisfies browser autoplay policy) ────────
     await this.waitForStart()
     this.music.loadTrack(2, false)
+
+    // ── Slideshow mode: skip intro entirely, open carousel overlay ────────────
+    if (this.isSlideshowMode) {
+      introScreen?.remove()
+      this.hideLoadingScreen()
+      document.body.classList.add('is-ready')
+      setTimeout(() => document.body.classList.add('is-intro-done'), 100)
+      this.carousel.open()
+      return
+    }
+
     this.music.unmute()
 
     // ── Non-first-visit fast path ─────────────────────────────────────────────
@@ -460,8 +476,11 @@ class Engine {
       el.className = 'start-screen'
       el.innerHTML = `
         <div class="start-screen__buttons">
-          <button class="start-screen__btn">Start</button>
-          <button class="start-screen__btn start-screen__btn--present">Present</button>
+          <button class="start-screen__btn" data-tooltip="Start the website normally.">Start</button>
+          <button class="start-screen__btn start-screen__btn--present" data-tooltip="Start normally, but in fullscreen present mode.">Present</button>
+        </div>
+        <div class="start-screen__slideshow-row">
+          <button class="start-screen__btn start-screen__btn--present start-screen__btn--slideshow" data-tooltip="Start in a plain PowerPoint style presentation.">Slideshow</button>
         </div>
         <p class="start-screen__hint">or press space</p>
       `
@@ -482,6 +501,10 @@ class Engine {
       el.querySelector('.start-screen__btn').addEventListener('click', finish, { once: true })
       el.querySelector('.start-screen__btn--present').addEventListener('click', () => {
         this.togglePresentMode()
+        finish()
+      }, { once: true })
+      el.querySelector('.start-screen__btn--slideshow').addEventListener('click', () => {
+        this.isSlideshowMode = true
         finish()
       }, { once: true })
       window.addEventListener('keydown', onKey)
