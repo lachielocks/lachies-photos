@@ -764,6 +764,36 @@ body.is-presenting .frame::before {
   margin-top: -0.25rem;
 }
 
+/* Start screen button tooltips */
+
+.start-screen__btn[data-tooltip] {
+  position: relative;
+}
+
+.start-screen__btn[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 0.65rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(12, 12, 18, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--ui-font);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.4rem 0.75rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.start-screen__btn[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
 /* Carousel / slideshow overlay */
 
 .carousel-overlay {

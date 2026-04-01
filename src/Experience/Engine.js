@@ -476,11 +476,11 @@ class Engine {
       el.className = 'start-screen'
       el.innerHTML = `
         <div class="start-screen__buttons">
-          <button class="start-screen__btn">Start</button>
-          <button class="start-screen__btn start-screen__btn--present">Present</button>
+          <button class="start-screen__btn" data-tooltip="Start the website normally.">Start</button>
+          <button class="start-screen__btn start-screen__btn--present" data-tooltip="Start normally, but in fullscreen present mode.">Present</button>
         </div>
         <div class="start-screen__slideshow-row">
-          <button class="start-screen__btn start-screen__btn--present start-screen__btn--slideshow">Slideshow</button>
+          <button class="start-screen__btn start-screen__btn--present start-screen__btn--slideshow" data-tooltip="Start in a plain PowerPoint style presentation.">Slideshow</button>
         </div>
         <p class="start-screen__hint">or press space</p>
       `
