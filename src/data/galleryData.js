@@ -1,15 +1,15 @@
 import PHOTO01 from '@/assets/Dee Why - 1 - Edited.webp'
-import PHOTO01B from '@/assets/Dee Why - 1.webp'
-import PHOTO02 from '@/assets/Dee Why - 15.webp'
-import PHOTO03 from '@/assets/Dee Why - 18.webp'
-import PHOTO04 from '@/assets/Dee Why - 29.webp'
-import PHOTO05 from '@/assets/Dee Why - 6.webp'
-import PHOTO06 from '@/assets/Dee Why - 8.webp'
-import PHOTO07 from '@/assets/Flowingly Frozen Water.webp'
-import PHOTO08 from '@/assets/Frozen Water.webp'
-import PHOTO09 from '@/assets/IMG_0442.webp'
-import PHOTO10 from '@/assets/IMG_0473.webp'
-import PHOTO11 from '@/assets/IMG_0474.webp'
+import PHOTO01B from '@/assets/Dee Why - 1.JPG.webp'
+import PHOTO02 from '@/assets/Dee Why - 15.JPG.webp'
+import PHOTO03 from '@/assets/Dee Why - 18.JPG.webp'
+import PHOTO04 from '@/assets/Dee Why - 29.JPG.webp'
+import PHOTO05 from '@/assets/Dee Why - 6.JPG.webp'
+import PHOTO06 from '@/assets/Dee Why - 8.JPG.webp'
+import PHOTO07 from '@/assets/Flowingly Frozen Water.JPG.webp'
+import PHOTO08 from '@/assets/Frozen Water.JPG.webp'
+import PHOTO09 from '@/assets/IMG_0442.JPG.webp'
+import PHOTO10 from '@/assets/IMG_0473.JPG.webp'
+import PHOTO11 from '@/assets/IMG_0474.JPG.webp'
 import LUNA1 from '@/assets/Luna - 1.webp'
 import LUNA2 from '@/assets/Luna - 2.webp'
 import LUNA3 from '@/assets/Luna - 3.webp'
@@ -34,7 +34,7 @@ const galleryPlaneData = [
     blob2Color: '#7a4a6a',
     label: {
       word: 'The Tallest Tree',
-      tags: ['Dee Why', 'Edited'],
+      tags: ['Dee Why', 'Experimentation'],
       description: 'This highly edited photo was taken on the Dee Why Beach excursion where we were tasked with finding the tallest tree. This one caught my eye instantly. I had to get the photo. This photo was edited using Luminar Neo.',
       iso: '125',
       av: 'f/22',
@@ -324,7 +324,7 @@ const galleryPlaneData = [
     label: {
       word: 'Trashed I',
       navTitle: 'Trashed I',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: 'This photo was taken at the Lego Relics exhibition. It\'s quite fun, bringing all the carboard and rubbish to life with lego and making it look really fun!',
       iso: '640',
       av: 'f/4.5',
@@ -345,7 +345,7 @@ const galleryPlaneData = [
     label: {
       word: 'Trashed II',
       navTitle: 'Trashed II',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: 'This photo was taken at the Lego Relics exhibition. This is just a different angle of the previous photo.',
       iso: '640',
       av: 'f/4.5',
@@ -366,7 +366,7 @@ const galleryPlaneData = [
     label: {
       word: 'Not a Fan',
       navTitle: 'Not a Fan',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: "This photo was taken at the Lego Relics exhibition. I love this one! They brought an old fridge to life, it's so cool to see all the little details with the whole 'frozen kingdom' in there!",
       iso: '160',
       av: 'f/4.5',
@@ -387,7 +387,7 @@ const galleryPlaneData = [
     label: {
       word: 'Punchbug!',
       navTitle: 'Punchbug!',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: "This photo was taken at the Lego Relics exhibition. A whole city thriving off of waste energy from the back of a Volkswagon Beetle? That's what I call art.",
       iso: '640',
       av: 'f/4.5',
@@ -408,7 +408,7 @@ const galleryPlaneData = [
     label: {
       word: 'The Outlier',
       navTitle: 'The Outlier',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: 'This photo was taken at the Lego Relics exhibition. Solar panels among the nuclear Beetle engine, thanks for your cooperation in saving the climate.',
       iso: '500',
       av: 'f/4.5',
@@ -429,7 +429,7 @@ const galleryPlaneData = [
     label: {
       word: 'Powerful Up Close',
       navTitle: 'Powerful Up Close',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: 'This photo was taken at the Lego Relics exhibition. Zoomed it in, more detail, rock fuel, gneiss! (Look that up it\'s funny I promise...)',
       iso: '800',
       av: 'f/4.5',
@@ -450,7 +450,7 @@ const galleryPlaneData = [
     label: {
       word: 'Beach Day',
       navTitle: 'Beach Day',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: "This photo was taken at the Lego Relics exhibition. A beachside community living out of your dad's old jetski... absolute cinema.",
       iso: '320',
       av: 'f/4.5',
@@ -471,7 +471,7 @@ const galleryPlaneData = [
     label: {
       word: 'Galaga',
       navTitle: 'Galaga',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: 'Up Up Down Down Left Right Left Right B A Start',
       iso: '400',
       av: 'f/4.5',
@@ -492,7 +492,7 @@ const galleryPlaneData = [
     label: {
       word: 'Amplified',
       navTitle: 'Amplified',
-      tags: ['Relics', 'iPhone'],
+      tags: ['Relics'],
       description: "This photo was taken at the Lego Relics exhibition. I'm sure the music rocks.",
       iso: '160',
       av: 'f/4.5',
