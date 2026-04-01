@@ -120,6 +120,20 @@ class Carousel {
     this.metaTags.innerHTML = (label.tags || [])
       .map((tag) => `<span class="carousel-tag">${tag}</span>`)
       .join('')
+    this.metaTags.querySelectorAll('.carousel-tag').forEach((el, i) => {
+      el.animate(
+        [
+          { opacity: 0, transform: 'translateY(5px)' },
+          { opacity: 1, transform: 'translateY(0)' },
+        ],
+        {
+          duration: 380,
+          delay: i * 60,
+          easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          fill: 'both',
+        }
+      )
+    })
   }
 
   next() {

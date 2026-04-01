@@ -207,11 +207,25 @@ class Label {
     this.slideIn(this.wordElement, labelData.word || '', isFirstLoad ? 0 : 80)
     this.slideIn(this.descriptionElement, labelData.description || '', isFirstLoad ? 0 : 130)
 
-    // Tags
+    // Tags — staggered slide-up per pill
     if (this.tagsElement) {
       this.tagsElement.innerHTML = (labelData.tags || [])
         .map((tag) => `<span class="plane-label-card__tag">${tag}</span>`)
         .join('')
+      this.tagsElement.querySelectorAll('.plane-label-card__tag').forEach((el, i) => {
+        el.animate(
+          [
+            { opacity: 0, transform: 'translateY(6px)' },
+            { opacity: 1, transform: 'translateY(0)' },
+          ],
+          {
+            duration: 420,
+            delay: isFirstLoad ? i * 55 : 160 + i * 55,
+            easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            fill: 'both',
+          }
+        )
+      })
     }
 
     // Chip spring-pop
