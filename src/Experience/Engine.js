@@ -217,19 +217,6 @@ class Engine {
   }
 
   async playIntroReveal(playIntro) {
-    // ── Slideshow mode: skip intro, open carousel overlay ─────────────────────
-    if (this.isSlideshowMode) {
-      const introScreen = document.getElementById('intro-screen')
-      introScreen?.remove()
-      document.getElementById('loading-screen')?.remove()
-      this.music.loadTrack(2, false)
-      document.body.classList.add('is-ready')
-      setTimeout(() => document.body.classList.add('is-intro-done'), 100)
-      this.hideLoadingScreen()
-      this.carousel.open()
-      return
-    }
-
     // ── Skip mechanism ────────────────────────────────────────────────────────
     let skipped = false
     let resolveSkip
@@ -253,6 +240,17 @@ class Engine {
     // ── Wait for start interaction (satisfies browser autoplay policy) ────────
     await this.waitForStart()
     this.music.loadTrack(2, false)
+
+    // ── Slideshow mode: skip intro entirely, open carousel overlay ────────────
+    if (this.isSlideshowMode) {
+      introScreen?.remove()
+      this.hideLoadingScreen()
+      document.body.classList.add('is-ready')
+      setTimeout(() => document.body.classList.add('is-intro-done'), 100)
+      this.carousel.open()
+      return
+    }
+
     this.music.unmute()
 
     // ── Non-first-visit fast path ─────────────────────────────────────────────
