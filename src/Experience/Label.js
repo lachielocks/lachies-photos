@@ -6,6 +6,7 @@ class Label {
     this.leftIndexElement = null
     this.wordElement = null
     this.descriptionElement = null
+    this.tagsElement = null
     this.chipElement = null
     this.cameraValueElement = null
     this.isoValueElement = null
@@ -23,6 +24,7 @@ class Label {
         <p class="plane-label-overlay__index"></p>
         <p class="plane-label-card__word"></p>
         <p class="plane-label-card__description"></p>
+        <div class="plane-label-card__tags"></div>
         <span class="plane-label-overlay__chip"></span>
       </div>
       <article class="plane-label-card plane-label-overlay__right">
@@ -56,6 +58,7 @@ class Label {
       leftIndexElement: element.querySelector('.plane-label-overlay__index'),
       wordElement: element.querySelector('.plane-label-card__word'),
       descriptionElement: element.querySelector('.plane-label-card__description'),
+      tagsElement: element.querySelector('.plane-label-card__tags'),
       chipElement: element.querySelector('.plane-label-overlay__chip'),
       cameraValueElement: element.querySelector('.plane-label-card__value--camera'),
       isoValueElement: element.querySelector('.plane-label-card__value--iso'),
@@ -73,6 +76,7 @@ class Label {
       leftIndexElement,
       wordElement,
       descriptionElement,
+      tagsElement,
       chipElement,
       cameraValueElement,
       isoValueElement,
@@ -85,6 +89,7 @@ class Label {
     this.leftIndexElement = leftIndexElement
     this.wordElement = wordElement
     this.descriptionElement = descriptionElement
+    this.tagsElement = tagsElement
     this.chipElement = chipElement
     this.cameraValueElement = cameraValueElement
     this.isoValueElement = isoValueElement
@@ -202,6 +207,13 @@ class Label {
     this.slideIn(this.wordElement, labelData.word || '', isFirstLoad ? 0 : 80)
     this.slideIn(this.descriptionElement, labelData.description || '', isFirstLoad ? 0 : 130)
 
+    // Tags
+    if (this.tagsElement) {
+      this.tagsElement.innerHTML = (labelData.tags || [])
+        .map((tag) => `<span class="plane-label-card__tag">${tag}</span>`)
+        .join('')
+    }
+
     // Chip spring-pop
     this.animateChip(chipHex)
 
@@ -252,6 +264,7 @@ class Label {
     this.leftIndexElement = null
     this.wordElement = null
     this.descriptionElement = null
+    this.tagsElement = null
     this.chipElement = null
     this.cameraValueElement = null
     this.isoValueElement = null

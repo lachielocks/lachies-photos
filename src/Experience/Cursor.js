@@ -148,6 +148,7 @@ class Cursor {
 
   /** Returns true if the DOM element under the cursor is a UI overlay (nav, buttons, etc.) */
   isOverUI() {
+    if (document.querySelector('.carousel-overlay.is-visible')) return true
     const el = document.elementFromPoint(this.clientX, this.clientY)
     if (!el) return false
     return Boolean(

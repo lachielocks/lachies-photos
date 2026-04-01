@@ -15,6 +15,7 @@ class Carousel {
     this.metaAv = null
     this.metaTv = null
     this.metaFocal = null
+    this.metaTags = null
     this.isOpen = false
     this.onKeyDown = null
   }
@@ -53,6 +54,7 @@ class Carousel {
               <dd class="carousel-specs__focal"></dd>
             </div>
           </dl>
+          <div class="carousel-tags"></div>
         </aside>
       </div>
       <div class="carousel-info">
@@ -79,6 +81,7 @@ class Carousel {
     this.metaAv = el.querySelector('.carousel-specs__av')
     this.metaTv = el.querySelector('.carousel-specs__tv')
     this.metaFocal = el.querySelector('.carousel-specs__focal')
+    this.metaTags = el.querySelector('.carousel-tags')
 
     this.prevBtn.addEventListener('click', () => this.prev())
     this.nextBtn.addEventListener('click', () => this.next())
@@ -114,6 +117,9 @@ class Carousel {
     this.metaAv.textContent = label.av || '—'
     this.metaTv.textContent = label.tv || '—'
     this.metaFocal.textContent = label.focal || '—'
+    this.metaTags.innerHTML = (label.tags || [])
+      .map((tag) => `<span class="carousel-tag">${tag}</span>`)
+      .join('')
   }
 
   next() {
